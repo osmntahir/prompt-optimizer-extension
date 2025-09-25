@@ -49,6 +49,10 @@ class PopupManager {
       this.optimizeSelectedText();
     });
 
+    document.getElementById('instantOptimize').addEventListener('click', () => {
+      this.instantOptimizeText();
+    });
+
     document.getElementById('showHistory').addEventListener('click', () => {
       this.showFullHistory();
     });
@@ -171,17 +175,50 @@ class PopupManager {
       
       historyEmpty.style.display = 'none';
       
-      // Show recent 5 items
-      const recentHistory = history.slice(0, 5);
+      // Show recent 10 items instead of 5
+      const recentHistory = history.slice(0, 10);
       const historyHTML = recentHistory.map(item => this.createHistoryItemHTML(item)).join('');
       
       historyList.innerHTML = historyHTML;
       
-      // Add click listeners to history items
+      // Add click listeners to history items for copying
       historyList.querySelectorAll('.history-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const historyId = item.dataset.historyId;
-          this.showHistoryDetails(historyId);
+        item.addEventListener('click', async () => {
+          const historyId = parseInt(item.dataset.historyId);
+          const historyItem = history.find(h => h.id === historyId);
+          
+          if (historyItem) {
+            // Remove selected class from all items
+            historyList.querySelectorAll('.history-item').forEach(i => i.classList.remove('selected'));
+            
+            // Add selected class to clicked item
+            item.classList.add('selected');
+            
+            try {
+              await navigator.clipboard.writeText(historyItem.original);
+              this.showToast('Orijinal metin kopyalandı!', 'success');
+              
+              // Remove selected class after animation
+              setTimeout(() => {
+                item.classList.remove('selected');
+              }, 1500);
+            } catch (error) {
+              // Fallback for clipboard API
+              const textArea = document.createElement('textarea');
+              textArea.value = historyItem.original;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              this.showToast('Metin kopyalandı!', 'success');
+              
+              // Remove selected class after animation
+              setTimeout(() => {
+                item.classList.remove('selected');
+              }, 1500);
+            }
+          }
         });
       });
       
@@ -198,8 +235,8 @@ class PopupManager {
       minute: '2-digit'
     });
     
-    const preview = item.original.length > 60 
-      ? item.original.substring(0, 60) + '...'
+    const preview = item.original.length > 80 
+      ? item.original.substring(0, 80) + '...'
       : item.original;
       
     const improvement = this.calculateImprovementText(item.original.length, item.optimized.length);
@@ -208,8 +245,8 @@ class PopupManager {
     return `
       <div class="history-item" data-history-id="${item.id}">
         <div class="history-header">
-          <div class="history-website">${item.options?.website || 'Bilinmeyen Site'}</div>
           <div class="history-date">${formattedDate}</div>
+          <div class="copy-hint">Tıkla & Kopyala</div>
         </div>
         <div class="history-preview">${this.escapeHtml(preview)}</div>
         <div class="history-stats">
@@ -298,6 +335,56 @@ class PopupManager {
       
     } catch (error) {
       this.showToast('Seçili metin optimize edilemedi. Sayfayı yenileyin.', 'error');
+    }
+  }
+
+  async instantOptimizeText() {
+    try {
+      // Get active tab
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!tab || !tab.id) {
+        this.showToast('Aktif tab bulunamadı', 'error');
+        return;
+      }
+
+      // Check if content script is injected by trying to ping it
+      try {
+        await chrome.tabs.sendMessage(tab.id, { action: 'ping' });
+      } catch (pingError) {
+        // Content script not loaded, inject it
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['src/js/content.js']
+          });
+          await chrome.scripting.insertCSS({
+            target: { tabId: tab.id },
+            files: ['src/css/content.css']
+          });
+          // Wait a bit for script to initialize
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (injectError) {
+          this.showToast('Bu sayfada extension çalışmıyor', 'error');
+          return;
+        }
+      }
+      
+      // Send instant optimize message
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'instantOptimize'
+      });
+      
+      if (response?.success) {
+        this.showToast('✨ Metin anında optimize edildi!', 'success');
+        // Close popup
+        window.close();
+      } else {
+        this.showToast('Lütfen web sayfasında bir metin seçin', 'warning');
+      }
+      
+    } catch (error) {
+      this.showToast('Anında optimizasyon başarısız. Sayfayı yenileyin.', 'error');
     }
   }
 

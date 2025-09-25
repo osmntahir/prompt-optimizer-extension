@@ -49,9 +49,15 @@
   "commands": {
     "optimize_prompt": {
       "suggested_key": {
-        "default": "Ctrl+Shift+P"
+        "default": "Ctrl+Shift+O"
       },
       "description": "Seçili metni optimize et"
+    },
+    "instant_optimize": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Seçili metni anında optimize et (yerinde)"
     }
   },
   

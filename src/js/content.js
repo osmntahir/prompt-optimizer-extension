@@ -8,6 +8,8 @@ class ContentManager {
     this.isOptimizerVisible = false;
     this.currentOptimizer = null;
     this.selectedText = '';
+    this.originalTextBackup = null; // Ctrl+Z için backup
+    this.selectedRange = null; // Selection range backup
     this.init();
   }
 
@@ -29,6 +31,13 @@ class ContentManager {
           sendResponse({ text: text });
           break;
 
+        case 'instantOptimize':
+          this.handleInstantOptimize().then(result => {
+            sendResponse(result);
+          });
+          return true; // Async response
+          break;
+
         case 'ping':
           sendResponse({ pong: true });
           break;
@@ -45,10 +54,19 @@ class ContentManager {
       this.selectedText = window.getSelection().toString().trim();
     });
 
-    // Escape tuşu ile optimizer'ı kapat
+    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
+      // Escape tuşu ile optimizer'ı kapat
       if (e.key === 'Escape' && this.isOptimizerVisible) {
         this.hideOptimizer();
+        return;
+      }
+      
+      // Ctrl+Z ile instant optimize geri al
+      if (e.ctrlKey && e.key === 'z' && this.originalTextBackup && this.selectedRange) {
+        e.preventDefault();
+        this.undoInstantOptimize();
+        return;
       }
     });
   }
@@ -139,7 +157,7 @@ class ContentManager {
           
           <div class="po-control-group">
             <label>Uzunluk:</label>
-            <select class="po-select po-length" value="${options.length || 'maintain'}">
+            <select class="po-select po-length-select" value="${options.length || 'maintain'}">
               <option value="maintain">Aynı</option>
               <option value="shorter">Daha Kısa</option>
               <option value="longer">Daha Uzun</option>
@@ -199,29 +217,64 @@ class ContentManager {
       }
     });
 
-    // Kontrol değişiklikleri
+    // Kontrol değişiklikleri - Her select için ayrı ayrı kontrol
     const toneSelect = optimizer.querySelector('.po-tone');
-    const lengthSelect = optimizer.querySelector('.po-length');
+    const lengthSelect = optimizer.querySelector('.po-length-select');
     const languageSelect = optimizer.querySelector('.po-language');
 
-    [toneSelect, lengthSelect, languageSelect].forEach(select => {
-      select.addEventListener('change', () => {
+    console.log('🎯 Select elementleri:', {
+      toneSelect: !!toneSelect,
+      lengthSelect: !!lengthSelect,
+      languageSelect: !!languageSelect
+    });
+
+    // Ton değişikliği
+    if (toneSelect) {
+      toneSelect.addEventListener('change', (e) => {
+        console.log('🎵 Ton değişti:', e.target.value);
         const newOptions = {
           tone: toneSelect.value,
+          length: lengthSelect?.value || 'maintain',
+          language: languageSelect?.value || 'auto'
+        };
+        this.optimizeText(optimizer, originalText, newOptions);
+      });
+    }
+
+    // Uzunluk değişikliği
+    if (lengthSelect) {
+      lengthSelect.addEventListener('change', (e) => {
+        console.log('📏 Uzunluk değişti:', e.target.value);
+        const newOptions = {
+          tone: toneSelect?.value || 'neutral',
           length: lengthSelect.value,
+          language: languageSelect?.value || 'auto'
+        };
+        this.optimizeText(optimizer, originalText, newOptions);
+      });
+    }
+
+    // Dil değişikliği
+    if (languageSelect) {
+      languageSelect.addEventListener('change', (e) => {
+        console.log('🌍 Dil değişti:', e.target.value);
+        const newOptions = {
+          tone: toneSelect?.value || 'neutral',
+          length: lengthSelect?.value || 'maintain',
           language: languageSelect.value
         };
         this.optimizeText(optimizer, originalText, newOptions);
       });
-    });
+    }
 
     // Yeniden dene butonu
     optimizer.querySelector('.po-retry').addEventListener('click', () => {
       const options = {
-        tone: toneSelect.value,
-        length: lengthSelect.value,
-        language: languageSelect.value
+        tone: toneSelect?.value || 'neutral',
+        length: lengthSelect?.value || 'maintain',
+        language: languageSelect?.value || 'auto'
       };
+      console.log('🔄 Yeniden dene butonu - seçenekler:', options);
       this.optimizeText(optimizer, originalText, options);
     });
 
@@ -349,9 +402,9 @@ class ContentManager {
     }
   }
 
-  showToast(message, duration = 3000) {
+  showToast(message, duration = 3000, type = 'success') {
     const toast = document.createElement('div');
-    toast.className = 'po-toast';
+    toast.className = `po-toast po-toast-${type}`;
     toast.textContent = message;
     
     document.body.appendChild(toast);
@@ -374,6 +427,126 @@ class ContentManager {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Instant Optimize Functions
+  async handleInstantOptimize() {
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (!selectedText) {
+      return { success: false, message: 'Metin seçilmedi' };
+    }
+
+    try {
+      // Selection range'i kaydet (Ctrl+Z için)
+      this.selectedRange = selection.getRangeAt(0).cloneRange();
+      this.originalTextBackup = selectedText;
+      
+      // Loading indicator göster
+      this.showInstantOptimizeLoader();
+      
+      // Optimize et
+      const response = await chrome.runtime.sendMessage({
+        action: 'optimizeText',
+        text: selectedText,
+        options: { tone: 'neutral', length: 'maintain', language: 'auto' }
+      });
+
+      if (response?.success && response.data?.optimized) {
+        // Seçili metni optimize edilmiş halle değiştir
+        this.replaceSelectedText(response.data.optimized);
+        
+        this.hideInstantOptimizeLoader();
+        this.showToast('✨ Metin optimize edildi! (Ctrl+Z ile geri al)', 3000, 'success');
+        
+        return { success: true };
+      } else {
+        throw new Error(response?.error || 'Optimizasyon başarısız');
+      }
+    } catch (error) {
+      console.error('Instant optimize error:', error);
+      this.hideInstantOptimizeLoader();
+      this.showToast('❌ Optimizasyon başarısız: ' + error.message, 3000, 'error');
+      return { success: false, error: error.message };
+    }
+  }
+
+  replaceSelectedText(newText) {
+    if (this.selectedRange) {
+      // Seçili alanı sil ve yeni metni ekle
+      this.selectedRange.deleteContents();
+      
+      // Text node oluştur ve ekle
+      const textNode = document.createTextNode(newText);
+      this.selectedRange.insertNode(textNode);
+      
+      // Yeni metni seç (görsel feedback için)
+      const newSelection = window.getSelection();
+      newSelection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNode(textNode);
+      newSelection.addRange(newRange);
+    }
+  }
+
+  undoInstantOptimize() {
+    if (this.originalTextBackup && this.selectedRange) {
+      // Mevcut seçimi sil ve orijinal metni geri koy
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        
+        const textNode = document.createTextNode(this.originalTextBackup);
+        range.insertNode(textNode);
+        
+        // Orijinal metni seç
+        const newSelection = window.getSelection();
+        newSelection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNode(textNode);
+        newSelection.addRange(newRange);
+      }
+      
+      // Backup'ı temizle
+      this.originalTextBackup = null;
+      this.selectedRange = null;
+      
+      this.showToast('↶ Orijinal metin geri yüklendi', 2000);
+    }
+  }
+
+  showInstantOptimizeLoader() {
+    // Sayfada küçük bir loading indicator göster
+    const loader = document.createElement('div');
+    loader.id = 'po-instant-loader';
+    loader.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        animation: fadeIn 0.3s ease;
+      ">
+        ✨ Optimize ediliyor...
+      </div>
+    `;
+    document.body.appendChild(loader);
+  }
+
+  hideInstantOptimizeLoader() {
+    const loader = document.getElementById('po-instant-loader');
+    if (loader) {
+      loader.remove();
+    }
   }
 }
 

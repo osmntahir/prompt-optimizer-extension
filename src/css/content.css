@@ -381,6 +381,22 @@
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
+.po-toast-success {
+  background: #28a745;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.po-toast-error {
+  background: #dc3545;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.po-toast-warning {
+  background: #ffc107;
+  color: #212529;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
 .po-toast-visible {
   transform: translateX(0);
 }

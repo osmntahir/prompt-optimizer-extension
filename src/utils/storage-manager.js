@@ -19,18 +19,20 @@ class StorageManager {
     const newEntry = {
       id: Date.now(),
       timestamp: new Date().toISOString(),
-      original,
-      optimized,
-      options,
-      website: options.website || 'Unknown'
+      original: original.trim(),
+      optimized: optimized.trim(),
+      options: {
+        tone: options.tone || 'neutral',
+        length: options.length || 'maintain'
+      }
     };
 
     // Yeni entry'yi başa ekle
     history.unshift(newEntry);
     
-    // Maksimum sayıyı aş, eski olanları sil
-    if (history.length > this.maxHistory) {
-      history.splice(this.maxHistory);
+    // Maksimum 10 kayıt tut, eski olanları sil
+    if (history.length > 10) {
+      history.splice(10);
     }
 
     await chrome.storage.local.set({ optimizationHistory: history });

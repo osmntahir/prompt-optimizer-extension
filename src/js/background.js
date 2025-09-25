@@ -91,6 +91,8 @@ class BackgroundManager {
     chrome.commands.onCommand.addListener((command) => {
       if (command === 'optimize_prompt') {
         this.handleKeyboardShortcut();
+      } else if (command === 'instant_optimize') {
+        this.handleInstantOptimizeShortcut();
       }
     });
 
@@ -201,6 +203,45 @@ class BackgroundManager {
           source: 'keyboard'
         });
       } else {
+        this.showNotification('Lütfen optimize edilecek metni seçin.', 'warning');
+      }
+    } catch (error) {
+      this.showNotification('Bir hata oluştu. Sayfayı yenileyin.', 'error');
+    }
+  }
+
+  async handleInstantOptimizeShortcut() {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      // Check if content script is injected
+      try {
+        await chrome.tabs.sendMessage(tab.id, { action: 'ping' });
+      } catch (pingError) {
+        // Content script not loaded, inject it
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['src/js/content.js']
+          });
+          await chrome.scripting.insertCSS({
+            target: { tabId: tab.id },
+            files: ['src/css/content.css']
+          });
+          // Wait for script to initialize
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (injectError) {
+          this.showNotification('Bu sayfada extension çalışmıyor', 'error');
+          return;
+        }
+      }
+      
+      // Content script'e instant optimize mesajı gönder
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'instantOptimize'
+      });
+
+      if (!response?.success) {
         this.showNotification('Lütfen optimize edilecek metni seçin.', 'warning');
       }
     } catch (error) {
@@ -320,10 +361,7 @@ class BackgroundManager {
     const preferences = await this.storageManager.getPreferences();
     
     if (preferences.saveHistory) {
-      await this.storageManager.addToHistory(original, optimized, {
-        ...options,
-        website: await this.getCurrentWebsite()
-      });
+      await this.storageManager.addToHistory(original, optimized, options);
     }
   }
 
