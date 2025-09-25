@@ -14,7 +14,7 @@ class PopupManager {
     await this.initializeUtilities();
     
     this.setupEventListeners();
-    this.loadInitialData();
+    await this.loadInitialData();
   }
 
   async initializeUtilities() {
@@ -78,7 +78,6 @@ class PopupManager {
   }
 
   async loadInitialData() {
-    
     try {
       this.showLoading(true);
       
@@ -92,10 +91,6 @@ class PopupManager {
       await this.loadRecentHistory();
       
     } catch (error) {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
       this.showError('Veriler yüklenirken hata oluştu: ' + error.message);
     } finally {
       this.showLoading(false);
@@ -254,12 +249,39 @@ class PopupManager {
       // Get active tab
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       
-      // Send message to content script
+      if (!tab || !tab.id) {
+        this.showToast('Aktif tab bulunamadı', 'error');
+        return;
+      }
+
+      // Check if content script is injected by trying to ping it
+      try {
+        await chrome.tabs.sendMessage(tab.id, { action: 'ping' });
+      } catch (pingError) {
+        // Content script not loaded, inject it
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['src/js/content.js']
+          });
+          await chrome.scripting.insertCSS({
+            target: { tabId: tab.id },
+            files: ['src/css/content.css']
+          });
+          // Wait a bit for script to initialize
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (injectError) {
+          this.showToast('Bu sayfada extension çalışmıyor', 'error');
+          return;
+        }
+      }
+      
+      // Send message to content script to get selected text
       const response = await chrome.tabs.sendMessage(tab.id, {
         action: 'getSelectedText'
       });
       
-      if (response?.text) {
+      if (response?.text && response.text.length > 0) {
         // Send optimize message
         await chrome.tabs.sendMessage(tab.id, {
           action: 'showOptimizer',

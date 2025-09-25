@@ -29,6 +29,10 @@ class ContentManager {
           sendResponse({ text: text });
           break;
 
+        case 'ping':
+          sendResponse({ pong: true });
+          break;
+
         default:
           sendResponse({ success: false });
       }

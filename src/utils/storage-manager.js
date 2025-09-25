@@ -151,9 +151,13 @@ class StorageManager {
 }
 
 // Export for use in other modules
+// Universal export for different environments
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = StorageManager;
+} else if (typeof window !== 'undefined') {
+  // Browser context
+  window.StorageManager = StorageManager;
+} else if (typeof self !== 'undefined') {
+  // Service worker / worker context
+  self.StorageManager = StorageManager;
 }
-
-// Make available globally
-window.StorageManager = StorageManager;

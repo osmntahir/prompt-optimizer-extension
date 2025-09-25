@@ -139,14 +139,54 @@ class BackgroundManager {
         source: 'contextMenu'
       });
     } catch (error) {
-      console.error('Context menu error:', error);
-      this.showNotification('Bir hata oluştu. Sayfayı yenileyin.', 'error');
+      // If content script not loaded, try to inject
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['src/js/content.js']
+        });
+        await chrome.scripting.insertCSS({
+          target: { tabId: tab.id },
+          files: ['src/css/content.css']
+        });
+        // Retry the message
+        await chrome.tabs.sendMessage(tab.id, {
+          action: 'showOptimizer',
+          text: selectedText,
+          options: options,
+          source: 'contextMenu'
+        });
+      } catch (injectError) {
+        this.showNotification('Bu sayfada extension çalışmıyor', 'error');
+      }
     }
   }
 
   async handleKeyboardShortcut() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      // Check if content script is injected
+      try {
+        await chrome.tabs.sendMessage(tab.id, { action: 'ping' });
+      } catch (pingError) {
+        // Content script not loaded, inject it
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['src/js/content.js']
+          });
+          await chrome.scripting.insertCSS({
+            target: { tabId: tab.id },
+            files: ['src/css/content.css']
+          });
+          // Wait for script to initialize
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (injectError) {
+          this.showNotification('Bu sayfada extension çalışmıyor', 'error');
+          return;
+        }
+      }
       
       // Content script'e seçili metni al mesajı gönder
       const response = await chrome.tabs.sendMessage(tab.id, {
@@ -164,7 +204,6 @@ class BackgroundManager {
         this.showNotification('Lütfen optimize edilecek metni seçin.', 'warning');
       }
     } catch (error) {
-      console.error('Keyboard shortcut error:', error);
       this.showNotification('Bir hata oluştu. Sayfayı yenileyin.', 'error');
     }
   }

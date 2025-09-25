@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Extension Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 2px dashed rgba(255,255,255,0.3);
+        }
+        .test-text {
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            cursor: text;
+            user-select: text;
+            line-height: 1.6;
+        }
+        .instructions {
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .highlight {
+            background: rgba(255,255,0,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Prompt Optimizer - Final Test</h1>
+    
+    <div class="instructions">
+        <h3>� CRITICAL STEPS - TAKİP ET:</h3>
+        <ol>
+            <li><strong>🚀 Extension Reload:</strong> <code>chrome://extensions/</code> → Developer Mode ON → "Prompt Optimizer" → Reload</li>
+            <li><strong>🎯 Metin Seç:</strong> Aşağıdaki test metnini mouse ile seç</li>
+            <li><strong>🖱️ Sağ Tık Test:</strong> Sağ tık → "Prompt İyileştir" görünüyor mu?</li>
+            <li><strong>📱 Popup Test:</strong> Extension icon tıkla → "Seçili Metni Optimize Et" butonu</li>
+            <li><strong>⌨️ Keyboard Test:</strong> <span class="highlight">Ctrl+Shift+P</span> tuş kombinasyonu</li>
+            <li><strong>🔍 Service Worker:</strong> Extension details → Service Worker → Console</li>
+        </ol>
+        <div style="background: rgba(255,0,0,0.2); padding: 10px; border-radius: 5px; margin-top: 10px;">
+            ❗ EĞER ÇALIŞMIYORSA: F12 → Console → Hataları buraya kopyala!
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🎯 Test Metni (Seç ve Test Et):</h3>
+        <div class="test-text">
+            Bu bir test metnidir ve bu extension ile optimize edilmelidir. Metin seçildikten sonra sağ tıklayın veya Ctrl+Shift+P tuşlarına basın. Extension seçili metni alacak ve Gemini AI ile optimize edecektir. Sonuç hem orijinal hem de optimized versiyonu gösterecektir.
+        </div>
+        
+        <div class="test-text">
+            This is an English test text for the Prompt Optimizer extension. Select this text and right-click to test the context menu functionality. The extension should work with both Turkish and English content seamlessly.
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>✅ Beklenen Davranışlar:</h3>
+        <ul>
+            <li>✅ Metin seçimi algılanmalı</li>
+            <li>✅ Context menu "Prompt İyileştir" görünmeli</li>
+            <li>✅ Popup butonu çalışmalı</li>
+            <li>✅ Keyboard shortcut çalışmalı</li>
+            <li>✅ AI optimizasyonu tamamlanmalı</li>
+            <li>✅ Sonuçlar yan yana gösterilmeli</li>
+        </ul>
+    </div>
+
+    <script>
+        // Log selection changes
+        document.addEventListener('selectionchange', () => {
+            const selection = window.getSelection().toString();
+            if (selection.length > 10) {
+                console.log('🎯 Metin seçildi:', selection.length + ' karakter');
+            }
+        });
+
+        // Context menu detection
+        document.addEventListener('contextmenu', (e) => {
+            const selection = window.getSelection().toString();
+            if (selection.length > 0) {
+                console.log('🖱️ Context menu açıldı - Seçili metin var');
+            }
+        });
+
+        // Keyboard shortcut detection
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+                console.log('⌨️ Ctrl+Shift+P basıldı');
+                e.preventDefault();
+            }
+        });
+
+        console.log('🎯 Test sayfası hazır - Extension test edilebilir');
+    </script>
+</body>
+</html>

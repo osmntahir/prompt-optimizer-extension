@@ -7,8 +7,9 @@
   "permissions": [
     "activeTab",
     "contextMenus",
-  "storage",
-  "notifications"
+    "storage",
+    "notifications",
+    "scripting"
   ],
   
   "host_permissions": [
@@ -56,7 +57,7 @@
   
   "web_accessible_resources": [
     {
-      "resources": ["src/css/*", "src/icons/*", "test-automation.js", "src/debug.html"],
+      "resources": ["src/css/*", "src/icons/*"],
       "matches": ["<all_urls>"]
     }
   ]
