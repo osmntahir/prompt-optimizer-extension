@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Optimizer - Hoş Geldiniz</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 64px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    .features {
+      text-align: left;
+      margin-bottom: 32px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .feature-content h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #1f2937;
+    }
+
+    .feature-content p {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .setup-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .setup-section h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1f2937;
+    }
+
+    .api-input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .api-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .api-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 2px solid #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .help-link {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 14px;
+      margin-top: 12px;
+      display: inline-block;
+    }
+
+    .help-link:hover {
+      text-decoration: underline;
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .status-message {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .status-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    @media (max-width: 768px) {
+      .welcome-container {
+        padding: 24px;
+        margin: 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      .api-input-group {
+        flex-direction: column;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-container">
+    <span class="logo">✨</span>
+    <h1>Prompt Optimizer</h1>
+    <p class="subtitle">Seçili metinleri AI ile optimize edin. Daha iyi promptlar yazın.</p>
+
+    <div class="features">
+      <div class="feature">
+        <span class="feature-icon">🎯</span>
+        <div class="feature-content">
+          <h3>Kolay Optimizasyon</h3>
+          <p>Herhangi bir metni seçin, sağ tık yapın veya Ctrl+Shift+P tuşlayın</p>
+        </div>
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">🔧</span>
+        <div class="feature-content">
+          <h3>Çoklu Seçenekler</h3>
+          <p>Resmi, samimi, teknik veya kısa tonlarda optimize edebilirsiniz</p>
+        </div>
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">📚</span>
+        <div class="feature-content">
+          <h3>Geçmiş ve İstatistikler</h3>
+          <p>Son optimizasyonlarınızı görebilir ve gelişiminizi takip edebilirsiniz</p>
+        </div>
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">🌍</span>
+        <div class="feature-content">
+          <h3>Çoklu Dil Desteği</h3>
+          <p>Türkçe ve İngilizce metinleri otomatik olarak algılar ve optimize eder</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <h2>✅ Kurulum Tamamlandı</h2>
+      <p style="margin-bottom: 16px; color: #059669; font-weight: 500;">API anahtarı dahili olarak yapılandırılmış. Hemen kullanmaya başlayabilirsiniz!</p>
+      
+      <div style="background: #d1fae5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: #065f46; font-size: 20px;">🟢</span>
+          <span style="color: #065f46; font-weight: 600;">API anahtarı aktif ve hazır</span>
+        </div>
+      </div>
+
+      <div id="statusMessage" class="status-message" style="display: none;"></div>
+    </div>
+
+    <div class="actions">
+      <button id="tryNow" class="btn btn-primary">
+        🚀 Hemen Deneyin
+      </button>
+      <button id="viewExtensions" class="btn btn-secondary">
+        ⚙️ Eklenti Sayfası
+      </button>
+    </div>
+  </div>
+
+  <script>
+    class WelcomePage {
+      constructor() {
+        this.init();
+      }
+
+      init() {
+        this.setupEventListeners();
+        // API anahtarı her zaman hazır
+        this.showStatus('API anahtarı yapılandırılmış! Extension kullanıma hazır.', 'success');
+      }
+
+      setupEventListeners() {
+        document.getElementById('tryNow').addEventListener('click', () => {
+          this.tryNow();
+        });
+
+        document.getElementById('viewExtensions').addEventListener('click', () => {
+          chrome.tabs.create({ url: 'chrome://extensions/' });
+        });
+      }
+
+      showStatus(message, type) {
+        const statusDiv = document.getElementById('statusMessage');
+        if (statusDiv) {
+          statusDiv.textContent = message;
+          statusDiv.className = `status-message status-${type}`;
+          statusDiv.style.display = 'block';
+
+          if (type === 'success') {
+            setTimeout(() => {
+              statusDiv.style.display = 'none';
+            }, 5000);
+          }
+        }
+      }
+
+      async tryNow() {
+        try {
+          // Get current active tab
+          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          
+          if (tab && tab.url.startsWith('http')) {
+            // Switch to that tab
+            chrome.tabs.update(tab.id, { active: true });
+            
+            // Show instructions
+            this.showStatus('Bu sekmeyi kapatabilirsiniz. Aktif sekmeye geçin ve bir metin seçerek sağ tıklayın!', 'success');
+            
+            setTimeout(() => {
+              window.close();
+            }, 3000);
+          } else {
+            this.showStatus('Lütfen önce bir web sayfası açın, ardından metin seçerek deneyin.', 'error');
+          }
+        } catch (error) {
+          this.showStatus('Hata oluştu. Lütfen manuel olarak bir web sayfasında deneyin.', 'error');
+        }
+      }
+    }
+
+    // Initialize welcome page when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      new WelcomePage();
+    });
+  </script>
+</body>
+</html>

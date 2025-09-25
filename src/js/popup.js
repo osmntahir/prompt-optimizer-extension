@@ -1,0 +1,386 @@
+/**
+ * Popup Script
+ * Manages the extension popup interface and interactions
+ */
+
+class PopupManager {
+  constructor() {
+    this.storageManager = null;
+    this.init();
+  }
+
+  async init() {
+    // Import utility classes (simulated for popup context)
+    await this.initializeUtilities();
+    
+    this.setupEventListeners();
+    this.loadInitialData();
+  }
+
+  async initializeUtilities() {
+    // Create storage manager instance for popup
+    this.storageManager = {
+      async getHistory() {
+        const result = await chrome.storage.local.get(['optimizationHistory']);
+        return result.optimizationHistory || [];
+      },
+      
+      async clearHistory() {
+        await chrome.storage.local.remove(['optimizationHistory']);
+      },
+      
+      async getStats() {
+        const result = await chrome.storage.local.get(['stats']);
+        return result.stats || {
+          totalOptimizations: 0,
+          successfulOptimizations: 0,
+          failedOptimizations: 0,
+          mostUsedTone: 'neutral',
+          averageOriginalLength: 0,
+          averageOptimizedLength: 0
+        };
+      }
+    };
+  }
+
+  setupEventListeners() {
+    // Quick action buttons
+    document.getElementById('optimizeSelected').addEventListener('click', () => {
+      this.optimizeSelectedText();
+    });
+
+    document.getElementById('showHistory').addEventListener('click', () => {
+      this.showFullHistory();
+    });
+
+    // History management
+    document.getElementById('clearHistory').addEventListener('click', () => {
+      this.clearHistory();
+    });
+
+    // Footer links
+    document.getElementById('openSettings').addEventListener('click', (e) => {
+      e.preventDefault();
+      this.openSettingsPage();
+    });
+
+    document.getElementById('openDebug').addEventListener('click', (e) => {
+      e.preventDefault();
+      this.openDebugPage();
+    });
+
+    // Close popup when clicking outside (for debugging)
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('popup-overlay')) {
+        window.close();
+      }
+    });
+  }
+
+  async loadInitialData() {
+    
+    try {
+      this.showLoading(true);
+      
+      // API anahtarı her zaman aktif
+      this.showApiKeyConnected();
+      
+      // Load statistics
+      await this.loadStats();
+      
+      // Load recent history
+      await this.loadRecentHistory();
+      
+    } catch (error) {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      this.showError('Veriler yüklenirken hata oluştu: ' + error.message);
+    } finally {
+      this.showLoading(false);
+    }
+  }
+
+  showApiKeyConnected() {
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const apiInputGroup = document.getElementById('apiInputGroup');
+    
+    if (statusIndicator) {
+      statusIndicator.className = 'status-indicator connected';
+    }
+    if (statusText) {
+      statusText.textContent = 'Bağlı - API anahtarı aktif';
+    }
+    if (apiInputGroup) {
+      apiInputGroup.style.display = 'none';
+    }
+  }
+
+  async loadStats() {
+    try {
+      const stats = await this.storageManager.getStats();
+      
+      // Update UI elements
+      document.getElementById('totalOptimizations').textContent = stats.totalOptimizations;
+      
+      const successRate = stats.totalOptimizations > 0 
+        ? Math.round((stats.successfulOptimizations / stats.totalOptimizations) * 100)
+        : 0;
+      document.getElementById('successRate').textContent = `${successRate}%`;
+      
+      // Calculate average improvement
+      const avgImprovement = this.calculateAverageImprovement(stats);
+      document.getElementById('avgImprovement').textContent = avgImprovement;
+      
+      // Most used tone
+      const toneMap = {
+        'neutral': 'Dengeli',
+        'formal': 'Resmi',
+        'casual': 'Samimi',
+        'technical': 'Teknik',
+        'concise': 'Kısa'
+      };
+      document.getElementById('mostUsedTone').textContent = 
+        toneMap[stats.mostUsedTone] || 'Dengeli';
+        
+    } catch (error) {
+    }
+  }
+
+  calculateAverageImprovement(stats) {
+    if (stats.successfulOptimizations === 0) return '+0%';
+    
+    const originalAvg = stats.averageOriginalLength;
+    const optimizedAvg = stats.averageOptimizedLength;
+    
+    if (originalAvg === 0) return '+0%';
+    
+    const improvement = ((optimizedAvg - originalAvg) / originalAvg) * 100;
+    const sign = improvement >= 0 ? '+' : '';
+    
+    return `${sign}${Math.round(improvement)}%`;
+  }
+
+  async loadRecentHistory() {
+    try {
+      const history = await this.storageManager.getHistory();
+      const historyList = document.getElementById('historyList');
+      const historyEmpty = document.getElementById('historyEmpty');
+      
+      if (history.length === 0) {
+        historyEmpty.style.display = 'block';
+        return;
+      }
+      
+      historyEmpty.style.display = 'none';
+      
+      // Show recent 5 items
+      const recentHistory = history.slice(0, 5);
+      const historyHTML = recentHistory.map(item => this.createHistoryItemHTML(item)).join('');
+      
+      historyList.innerHTML = historyHTML;
+      
+      // Add click listeners to history items
+      historyList.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const historyId = item.dataset.historyId;
+          this.showHistoryDetails(historyId);
+        });
+      });
+      
+    } catch (error) {
+    }
+  }
+
+  createHistoryItemHTML(item) {
+    const date = new Date(item.timestamp);
+    const formattedDate = date.toLocaleDateString('tr-TR', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    const preview = item.original.length > 60 
+      ? item.original.substring(0, 60) + '...'
+      : item.original;
+      
+    const improvement = this.calculateImprovementText(item.original.length, item.optimized.length);
+    const toneText = this.getToneText(item.options?.tone || 'neutral');
+    
+    return `
+      <div class="history-item" data-history-id="${item.id}">
+        <div class="history-header">
+          <div class="history-website">${item.options?.website || 'Bilinmeyen Site'}</div>
+          <div class="history-date">${formattedDate}</div>
+        </div>
+        <div class="history-preview">${this.escapeHtml(preview)}</div>
+        <div class="history-stats">
+          <span class="history-stat">${improvement}</span>
+          <span class="history-stat">${toneText}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  calculateImprovementText(originalLength, optimizedLength) {
+    const difference = optimizedLength - originalLength;
+    const percentage = originalLength > 0 ? Math.round((difference / originalLength) * 100) : 0;
+    
+    if (difference > 0) {
+      return `+${percentage}%`;
+    } else if (difference < 0) {
+      return `${percentage}%`;
+    } else {
+      return '±0%';
+    }
+  }
+
+  getToneText(tone) {
+    const toneMap = {
+      'neutral': 'Dengeli',
+      'formal': 'Resmi',
+      'casual': 'Samimi',
+      'technical': 'Teknik',
+      'concise': 'Kısa'
+    };
+    return toneMap[tone] || 'Dengeli';
+  }
+
+  async optimizeSelectedText() {
+    try {
+      // Get active tab
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      // Send message to content script
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'getSelectedText'
+      });
+      
+      if (response?.text) {
+        // Send optimize message
+        await chrome.tabs.sendMessage(tab.id, {
+          action: 'showOptimizer',
+          text: response.text,
+          options: { tone: 'neutral' },
+          source: 'popup'
+        });
+        
+        // Close popup
+        window.close();
+      } else {
+        this.showToast('Lütfen web sayfasında bir metin seçin', 'warning');
+      }
+      
+    } catch (error) {
+      this.showToast('Seçili metin optimize edilemedi. Sayfayı yenileyin.', 'error');
+    }
+  }
+
+  showFullHistory() {
+    // Open history page in new tab
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('src/history.html')
+    });
+  }
+
+  async clearHistory() {
+    if (confirm('Tüm geçmiş silinsin mi? Bu işlem geri alınamaz.')) {
+      try {
+        await this.storageManager.clearHistory();
+        await this.loadRecentHistory();
+        await this.loadStats();
+        this.showToast('Geçmiş temizlendi', 'success');
+      } catch (error) {
+        this.showToast('Geçmiş temizlenemedi', 'error');
+      }
+    }
+  }
+
+  showHistoryDetails(historyId) {
+    // Open history details or show in modal
+    // Implementation would open detailed view
+  }
+
+  openSettingsPage() {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('src/settings.html')
+    });
+  }
+
+  openDebugPage() {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('src/debug.html')
+    });
+  }
+
+  showLoading(show) {
+    const overlay = document.getElementById('loadingOverlay');
+    overlay.style.display = show ? 'flex' : 'none';
+  }
+
+  showToast(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `popup-toast popup-toast-${type}`;
+    toast.textContent = message;
+    
+    // Style the toast
+    Object.assign(toast.style, {
+      position: 'fixed',
+      top: '10px',
+      right: '10px',
+      padding: '8px 16px',
+      borderRadius: '6px',
+      color: 'white',
+      fontSize: '12px',
+      fontWeight: '500',
+      zIndex: '10000',
+      transform: 'translateX(100%)',
+      transition: 'transform 0.3s ease'
+    });
+    
+    // Set background color based on type
+    const colors = {
+      'success': '#10b981',
+      'error': '#ef4444',
+      'warning': '#f59e0b',
+      'info': '#3b82f6'
+    };
+    toast.style.background = colors[type] || colors.info;
+    
+    document.body.appendChild(toast);
+    
+    // Show toast
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translateX(0)';
+    });
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+      toast.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  showError(message) {
+    this.showToast(message, 'error');
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+}
+
+// Initialize popup when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new PopupManager();
+});

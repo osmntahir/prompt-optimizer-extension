@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Optimizer</title>
+  <link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="header-content">
+        <span class="logo">✨</span>
+        <h1>Prompt Optimizer</h1>
+      </div>
+      <div class="version">v1.0.0</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="popup-main">
+      <!-- Quick Actions -->
+      <section class="quick-actions">
+        <h2>Hızlı Eylemler</h2>
+        <div class="action-buttons">
+          <button class="action-btn" id="optimizeSelected">
+            <span class="btn-icon">🎯</span>
+            <div class="btn-content">
+              <div class="btn-title">Seçili Metni Optimize Et</div>
+              <div class="btn-subtitle">Ctrl+Shift+P</div>
+            </div>
+          </button>
+          
+          <button class="action-btn" id="showHistory">
+            <span class="btn-icon">📚</span>
+            <div class="btn-content">
+              <div class="btn-title">Geçmişi Görüntüle</div>
+              <div class="btn-subtitle">Son 10 optimizasyon</div>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- API Status (Read-only) -->
+      <section class="api-section" id="apiSection">
+        <h2>API Durumu</h2>
+        <div class="api-status" id="apiStatus">
+          <div class="status-indicator connected" id="statusIndicator"></div>
+          <span id="statusText">API anahtarı aktif</span>
+        </div>
+      </section>
+
+      <!-- Statistics -->
+      <section class="stats-section" id="statsSection">
+        <h2>İstatistikler</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="totalOptimizations">0</div>
+            <div class="stat-label">Toplam Optimizasyon</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="successRate">0%</div>
+            <div class="stat-label">Başarı Oranı</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="avgImprovement">+0%</div>
+            <div class="stat-label">Ort. İyileştirme</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="mostUsedTone">-</div>
+            <div class="stat-label">En Çok Kullanılan Ton</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent History -->
+      <section class="history-section">
+        <div class="section-header">
+          <h2>Son Optimizasyonlar</h2>
+          <button class="text-btn" id="clearHistory">Temizle</button>
+        </div>
+        
+        <div class="history-list" id="historyList">
+          <div class="history-empty" id="historyEmpty">
+            <span class="empty-icon">📝</span>
+            <div class="empty-text">Henüz optimizasyon geçmişi yok</div>
+            <div class="empty-subtitle">Bir metni seçip optimize etmeye başlayın</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <div class="footer-links">
+        <a href="#" class="footer-link" id="openSettings">⚙️ Ayarlar</a>
+        <a href="#" class="footer-link" id="openDebug">🔬 Debug</a>
+        <a href="https://buymeacoffee.com/promptoptimizer" target="_blank" class="footer-link support-link">
+          ☕ Kahve ısmarla
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Yükleniyor...</div>
+  </div>
+
+  <script src="js/popup.js"></script>
+</body>
+</html>
