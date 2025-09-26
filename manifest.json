@@ -47,12 +47,6 @@
   },
   
   "commands": {
-    "optimize_prompt": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+O"
-      },
-      "description": "Seçili prompt'u iyileştir"
-    },
     "instant_optimize": {
       "suggested_key": {
         "default": "Ctrl+Shift+Y"

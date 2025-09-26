@@ -19,6 +19,7 @@ class BackgroundManager {
   init() {
     this.setupContextMenu();
     this.setupEventListeners();
+    this.setupStorageListeners();
   }
 
   setupContextMenu() {
@@ -89,9 +90,7 @@ class BackgroundManager {
 
     // Keyboard shortcut handler
     chrome.commands.onCommand.addListener((command) => {
-      if (command === 'optimize_prompt') {
-        this.handleKeyboardShortcut();
-      } else if (command === 'instant_optimize') {
+      if (command === 'instant_optimize') {
         this.handleInstantOptimizeShortcut();
       }
     });
@@ -164,52 +163,6 @@ class BackgroundManager {
     }
   }
 
-  async handleKeyboardShortcut() {
-    try {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
-      // Check if content script is injected
-      try {
-        await chrome.tabs.sendMessage(tab.id, { action: 'ping' });
-      } catch (pingError) {
-        // Content script not loaded, inject it
-        try {
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['src/js/content.js']
-          });
-          await chrome.scripting.insertCSS({
-            target: { tabId: tab.id },
-            files: ['src/css/content.css']
-          });
-          // Wait for script to initialize
-          await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (injectError) {
-          this.showNotification('Bu sayfada extension çalışmıyor', 'error');
-          return;
-        }
-      }
-      
-      // Content script'e seçili metni al mesajı gönder
-      const response = await chrome.tabs.sendMessage(tab.id, {
-        action: 'getSelectedText'
-      });
-
-      if (response?.text) {
-        await chrome.tabs.sendMessage(tab.id, {
-          action: 'showOptimizer',
-          text: response.text,
-          options: { tone: 'neutral' },
-          source: 'keyboard'
-        });
-      } else {
-        this.showNotification('Lütfen optimize edilecek metni seçin.', 'warning');
-      }
-    } catch (error) {
-      this.showNotification('Bir hata oluştu. Sayfayı yenileyin.', 'error');
-    }
-  }
-
   async handleInstantOptimizeShortcut() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -270,9 +223,13 @@ class BackgroundManager {
               throw new Error('Optimize edilecek metin bulunamadı');
             }
 
+            // Get user preferences for default tone
+            const preferences = await this.storageManager.getPreferences();
+            const defaultTone = preferences.defaultTone || 'neutral';
+
             // Varsayılanlar
             const normalizedOptions = {
-              tone: options.tone || 'neutral',
+              tone: options.tone || defaultTone,
               length: options.length || 'maintain',
               language: options.language || 'auto'
             };
@@ -329,6 +286,10 @@ class BackgroundManager {
 
         case 'clearHistory':
           await this.storageManager.clearHistory();
+          
+          // Broadcast to all components that history was cleared
+          this.broadcastHistoryCleared();
+          
           sendResponse({ success: true });
           break;
 
@@ -423,6 +384,42 @@ class BackgroundManager {
 
   handleUpdate(details) {
     // Extension güncellendi
+  }
+
+  setupStorageListeners() {
+    // Listen for storage changes to broadcast to other components
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'local') {
+        // Notify all tabs about storage changes
+        chrome.tabs.query({}, (tabs) => {
+          tabs.forEach(tab => {
+            if (tab.url && !tab.url.startsWith('chrome://')) {
+              chrome.tabs.sendMessage(tab.id, {
+                action: 'storageChanged',
+                changes: changes
+              }).catch(() => {
+                // Ignore errors for tabs without content script
+              });
+            }
+          });
+        });
+      }
+    });
+  }
+
+  broadcastHistoryCleared() {
+    // Notify all tabs that history was cleared
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        if (tab.url && !tab.url.startsWith('chrome://')) {
+          chrome.tabs.sendMessage(tab.id, {
+            action: 'historyCleared'
+          }).catch(() => {
+            // Ignore errors for tabs without content script
+          });
+        }
+      });
+    });
   }
 }
 

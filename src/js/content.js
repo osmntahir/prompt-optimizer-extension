@@ -42,6 +42,16 @@ class ContentManager {
           sendResponse({ pong: true });
           break;
 
+        case 'storageChanged':
+          this.handleStorageChanged(request.changes);
+          sendResponse({ success: true });
+          break;
+
+        case 'historyCleared':
+          this.handleHistoryCleared();
+          sendResponse({ success: true });
+          break;
+
         default:
           sendResponse({ success: false });
       }
@@ -437,11 +447,15 @@ class ContentManager {
       // Loading indicator göster
       this.showInstantOptimizeLoader();
       
+      // Get user preferences for default tone
+      const preferences = await chrome.storage.sync.get(['userPreferences']);
+      const defaultTone = preferences.userPreferences?.defaultTone || 'neutral';
+      
       // Optimize et
       const response = await chrome.runtime.sendMessage({
         action: 'optimizeText',
         text: selectedText,
-        options: { tone: 'neutral', length: 'maintain', language: 'auto' }
+        options: { tone: defaultTone, length: 'maintain', language: 'auto' }
       });
 
       if (response?.success && response.data?.optimized) {
@@ -538,6 +552,20 @@ class ContentManager {
     if (loader) {
       loader.remove();
     }
+  }
+
+  handleStorageChanged(changes) {
+    // Handle storage changes if needed
+    // This can be used to update any UI elements that depend on storage
+    if (changes.optimizationHistory) {
+      // History changed, could update any history-related UI
+    }
+  }
+
+  handleHistoryCleared() {
+    // Handle when history is cleared
+    // This could be used to update any UI elements that show history data
+    // Currently no persistent UI elements in content script, but keeping for future use
   }
 }
 

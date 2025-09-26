@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Optimizer - Ayarlar</title>
+  <link rel="stylesheet" href="css/popup.css">
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      min-width: 600px;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0;
+      overflow-y: auto;
+    }
+    
+    .settings-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .settings-content {
+      flex: 1;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .settings-section {
+      background: #2a2a3e;
+      margin: 20px 0;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #444;
+    }
+    
+    .settings-section h3 {
+      color: #E0E0E0;
+      font-size: 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .setting-item {
+      margin: 16px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .setting-label {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .setting-title {
+      color: #E0E0E0;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .setting-description {
+      color: #A0A0A0;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    
+    .setting-control {
+      margin-left: 20px;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      background: #444;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .toggle-switch.active {
+      background: #667eea;
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+    
+    .toggle-switch.active::after {
+      transform: translateX(26px);
+    }
+    
+    .select-input {
+      background: #1e1e2e;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #E0E0E0;
+      padding: 8px 12px;
+      font-size: 14px;
+      min-width: 120px;
+    }
+    
+    .select-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .number-input {
+      background: #1e1e2e;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #E0E0E0;
+      padding: 8px 12px;
+      font-size: 14px;
+      width: 80px;
+      text-align: center;
+    }
+    
+    .number-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+    }
+    
+    .back-button:hover {
+      background: #5a6de8;
+    }
+    
+    .coffee-link {
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+      display: inline-block;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    
+    .coffee-link:hover {
+      transform: scale(1.1);
+      opacity: 0.8;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .coffee-link:active {
+      transform: scale(0.95);
+    }
+    
+    .version-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .coffee-icon {
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="header-content">
+        <span class="logo">⚙️</span>
+        <h1>Ayarlar</h1>
+      </div>
+      <div class="version-section">
+        <div class="version">v1.0.0</div>
+        <a href="https://buymeacoffee.com/osmntahir" target="_blank" class="coffee-link" title="Bana bir kahve ısmarla ☕">
+          <span class="coffee-icon">☕</span>
+        </a>
+      </div>
+    </header>
+
+    <div class="settings-content">
+      <!-- İyileştirme Ayarları -->
+      <div class="settings-section">
+        <h3>🎯 İyileştirme Ayarları</h3>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <div class="setting-title">Varsayılan Ton</div>
+            <div class="setting-description">Prompt iyileştirirken kullanılacak varsayılan ton stili</div>
+          </div>
+          <div class="setting-control">
+            <select class="select-input" id="defaultTone">
+              <option value="neutral">Dengeli</option>
+              <option value="formal">Resmi</option>
+              <option value="casual">Samimi</option>
+              <option value="technical">Teknik</option>
+              <option value="concise">Kısa ve Öz</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <div class="setting-title">Otomatik İyileştirme</div>
+            <div class="setting-description">Metin seçildiğinde otomatik olarak iyileştirme önerisi göster</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch" id="autoOptimize"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Geçmiş Ayarları -->
+      <div class="settings-section">
+        <h3>📚 Geçmiş Ayarları</h3>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <div class="setting-title">Geçmiş Kaydetme</div>
+            <div class="setting-description">İyileştirme geçmişini kaydet ve saklasın</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch active" id="saveHistory"></div>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <div class="setting-title">Maksimum Geçmiş</div>
+            <div class="setting-description">Saklanacak maksimum geçmiş kayıt sayısı</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" class="number-input" id="maxHistory" min="5" max="50" value="10">
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <div class="setting-title">Geçmiş Temizle</div>
+            <div class="setting-description">Tüm kayıtlı geçmişi kalıcı olarak sil</div>
+          </div>
+          <div class="setting-control">
+            <button class="reset-button" id="clearAllHistory">Geçmişi Temizle</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bildirim Ayarları -->
+      <div class="settings-section">
+        <h3>🔔 Bildirim Ayarları</h3>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <div class="setting-title">Başarı Bildirimleri</div>
+            <div class="setting-description">İyileştirme başarılı olduğunda bildirim göster</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch active" id="showSuccessNotifications"></div>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-label">
+            <div class="setting-title">Hata Bildirimleri</div>
+            <div class="setting-description">Bir hata oluştuğunda bildirim göster</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle-switch active" id="showErrorNotifications"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kaydet Butonu -->
+      <button class="save-button" id="saveSettings">Ayarları Kaydet</button>
+    </div>
+  </div>
+
+  <script src="js/settings.js"></script>
+</body>
+</html>

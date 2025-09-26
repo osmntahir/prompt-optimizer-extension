@@ -14,31 +14,61 @@ class PopupManager {
     await this.initializeUtilities();
     
     this.setupEventListeners();
+    this.setupStorageListeners();
     await this.loadInitialData();
   }
 
   async initializeUtilities() {
-    // Create storage manager instance for popup
+    // Create storage manager instance for popup that uses background script
     this.storageManager = {
       async getHistory() {
-        const result = await chrome.storage.local.get(['optimizationHistory']);
-        return result.optimizationHistory || [];
+        try {
+          const response = await chrome.runtime.sendMessage({
+            action: 'getHistory'
+          });
+          return (response && response.success) ? response.data : [];
+        } catch (error) {
+          console.error('Error getting history:', error);
+          return [];
+        }
       },
       
       async clearHistory() {
-        await chrome.storage.local.remove(['optimizationHistory']);
+        try {
+          const response = await chrome.runtime.sendMessage({
+            action: 'clearHistory'
+          });
+          return response && response.success;
+        } catch (error) {
+          console.error('Error clearing history:', error);
+          return false;
+        }
       },
       
       async getStats() {
-        const result = await chrome.storage.local.get(['stats']);
-        return result.stats || {
-          totalOptimizations: 0,
-          successfulOptimizations: 0,
-          failedOptimizations: 0,
-          mostUsedTone: 'neutral',
-          averageOriginalLength: 0,
-          averageOptimizedLength: 0
-        };
+        try {
+          const response = await chrome.runtime.sendMessage({
+            action: 'getStats'
+          });
+          return (response && response.success) ? response.data : {
+            totalOptimizations: 0,
+            successfulOptimizations: 0,
+            failedOptimizations: 0,
+            mostUsedTone: 'neutral',
+            averageOriginalLength: 0,
+            averageOptimizedLength: 0
+          };
+        } catch (error) {
+          console.error('Error getting stats:', error);
+          return {
+            totalOptimizations: 0,
+            successfulOptimizations: 0,
+            failedOptimizations: 0,
+            mostUsedTone: 'neutral',
+            averageOriginalLength: 0,
+            averageOptimizedLength: 0
+          };
+        }
       }
     };
   }
@@ -64,10 +94,37 @@ class PopupManager {
       this.openSettingsPage();
     });
 
+    // Coffee link
+    const coffeeLink = document.querySelector('.coffee-link');
+    if (coffeeLink) {
+      coffeeLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({
+          url: 'https://buymeacoffee.com/osmntahir'
+        });
+      });
+    }
+
     // Close popup when clicking outside (for debugging)
     document.addEventListener('click', (e) => {
       if (e.target.classList.contains('popup-overlay')) {
         window.close();
+      }
+    });
+  }
+
+  setupStorageListeners() {
+    // Listen for storage changes to refresh UI immediately
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'local') {
+        // If optimization history changed, reload history
+        if (changes.optimizationHistory) {
+          // Debounce multiple rapid changes
+          clearTimeout(this.historyReloadTimer);
+          this.historyReloadTimer = setTimeout(() => {
+            this.loadRecentHistory().catch(() => {});
+          }, 100);
+        }
       }
     });
   }
@@ -78,9 +135,6 @@ class PopupManager {
       
       // API anahtarı her zaman aktif
       this.showApiKeyConnected();
-      
-      // Load statistics
-      await this.loadStats();
       
       // Load recent history
       await this.loadRecentHistory();
@@ -106,51 +160,6 @@ class PopupManager {
     if (apiInputGroup) {
       apiInputGroup.style.display = 'none';
     }
-  }
-
-  async loadStats() {
-    try {
-      const stats = await this.storageManager.getStats();
-      
-      // Update UI elements
-      document.getElementById('totalOptimizations').textContent = stats.totalOptimizations;
-      
-      const successRate = stats.totalOptimizations > 0 
-        ? Math.round((stats.successfulOptimizations / stats.totalOptimizations) * 100)
-        : 0;
-      document.getElementById('successRate').textContent = `${successRate}%`;
-      
-      // Calculate average improvement
-      const avgImprovement = this.calculateAverageImprovement(stats);
-      document.getElementById('avgImprovement').textContent = avgImprovement;
-      
-      // Most used tone
-      const toneMap = {
-        'neutral': 'Dengeli',
-        'formal': 'Resmi',
-        'casual': 'Samimi',
-        'technical': 'Teknik',
-        'concise': 'Kısa'
-      };
-      document.getElementById('mostUsedTone').textContent = 
-        toneMap[stats.mostUsedTone] || 'Dengeli';
-        
-    } catch (error) {
-    }
-  }
-
-  calculateAverageImprovement(stats) {
-    if (stats.successfulOptimizations === 0) return '+0%';
-    
-    const originalAvg = stats.averageOriginalLength;
-    const optimizedAvg = stats.averageOptimizedLength;
-    
-    if (originalAvg === 0) return '+0%';
-    
-    const improvement = ((optimizedAvg - originalAvg) / originalAvg) * 100;
-    const sign = improvement >= 0 ? '+' : '';
-    
-    return `${sign}${Math.round(improvement)}%`;
   }
 
   async loadRecentHistory() {
@@ -332,11 +341,15 @@ class PopupManager {
       });
       
       if (response?.text && response.text.length > 0) {
+        // Get user preferences for default tone
+        const preferences = await chrome.storage.sync.get(['userPreferences']);
+        const defaultTone = preferences.userPreferences?.defaultTone || 'neutral';
+        
         // Send optimize message
         await chrome.tabs.sendMessage(tab.id, {
           action: 'showOptimizer',
           text: response.text,
-          options: { tone: 'neutral' },
+          options: { tone: defaultTone },
           source: 'popup'
         });
         
@@ -404,13 +417,72 @@ class PopupManager {
   async clearHistory() {
     if (confirm('Tüm geçmiş silinsin mi? Bu işlem geri alınamaz.')) {
       try {
-        await this.storageManager.clearHistory();
-        await this.loadRecentHistory();
-        await this.loadStats();
-        this.showToast('Geçmiş temizlendi', 'success');
+        // Show immediate visual feedback
+        const clearButton = document.getElementById('clearHistory');
+        const originalText = clearButton ? clearButton.textContent : '';
+        
+        if (clearButton) {
+          clearButton.textContent = 'Temizleniyor...';
+          clearButton.disabled = true;
+          clearButton.style.opacity = '0.6';
+        }
+        
+        // Immediately clear the UI for instant feedback
+        await this.updateUIAfterHistoryCleared();
+        
+        // Use background script to clear history for consistency
+        const response = await chrome.runtime.sendMessage({
+          action: 'clearHistory'
+        });
+        
+        if (response && response.success) {
+          this.showToast('Geçmiş temizlendi', 'success');
+        } else {
+          // If background script fails, reload from storage
+          await this.loadRecentHistory();
+          throw new Error('Background script response failed');
+        }
       } catch (error) {
+        console.error('Clear history error:', error);
         this.showToast('Geçmiş temizlenemedi', 'error');
+        // Reload data in case of error
+        await this.loadRecentHistory();
+      } finally {
+        // Restore button state
+        const clearButton = document.getElementById('clearHistory');
+        if (clearButton) {
+          clearButton.textContent = 'Geçmişi Temizle';
+          clearButton.disabled = false;
+          clearButton.style.opacity = '1';
+        }
       }
+    }
+  }
+
+  async updateUIAfterHistoryCleared() {
+    try {
+      // Immediately clear the history list
+      const historyList = document.getElementById('historyList');
+      const historyEmpty = document.getElementById('historyEmpty');
+      
+      // Clear history display
+      if (historyList) {
+        historyList.innerHTML = '';
+      }
+      
+      // Show empty state
+      if (historyEmpty) {
+        historyEmpty.style.display = 'block';
+      }
+      
+      // Add a small delay to ensure visual feedback is seen
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Reload data from storage to ensure consistency
+      await this.loadRecentHistory();
+      
+    } catch (error) {
+      console.error('Error updating UI after history cleared:', error);
     }
   }
 
