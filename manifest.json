@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Prompt Optimizer",
   "version": "1.0.0",
-  "description": "Seçili metinleri AI ile optimize eder. Hem orijinal hem geliştirilmiş versiyonu gösterir.",
+  "description": "Seçili prompt'ları AI ile iyileştirir. Yapay zeka için daha anlaşılır hale getirir.",
   
   "permissions": [
     "activeTab",
@@ -51,13 +51,13 @@
       "suggested_key": {
         "default": "Ctrl+Shift+O"
       },
-      "description": "Seçili metni optimize et"
+      "description": "Seçili prompt'u iyileştir"
     },
     "instant_optimize": {
       "suggested_key": {
         "default": "Ctrl+Shift+Y"
       },
-      "description": "Seçili metni anında optimize et (yerinde)"
+      "description": "Seçili prompt'u anında iyileştir (yerinde)"
     }
   },
   

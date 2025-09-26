@@ -26,7 +26,7 @@
           <button class="action-btn" id="optimizeSelected">
             <span class="btn-icon">🎯</span>
             <div class="btn-content">
-              <div class="btn-title">Seçili Metni Optimize Et</div>
+              <div class="btn-title">Seçili Prompt'u İyileştir</div>
               <div class="btn-subtitle">Ctrl+Shift+O</div>
             </div>
           </button>
@@ -34,16 +34,8 @@
           <button class="action-btn" id="instantOptimize">
             <span class="btn-icon">⚡</span>
             <div class="btn-content">
-              <div class="btn-title">Anında Optimize Et</div>
-              <div class="btn-subtitle">Ctrl+Shift+I (Ctrl+Z ile geri al)</div>
-            </div>
-          </button>
-          
-          <button class="action-btn" id="showHistory">
-            <span class="btn-icon">📚</span>
-            <div class="btn-content">
-              <div class="btn-title">Geçmişi Görüntüle</div>
-              <div class="btn-subtitle">Son 10 optimizasyon</div>
+              <div class="btn-title">Anında İyileştir</div>
+              <div class="btn-subtitle">Ctrl+Shift+Y (Ctrl+Z ile geri al)</div>
             </div>
           </button>
         </div>
@@ -84,15 +76,15 @@
       <!-- Recent History -->
       <section class="history-section">
         <div class="section-header">
-          <h2>Son Optimizasyonlar</h2>
+          <h2>Son İyileştirmeler</h2>
           <button class="text-btn" id="clearHistory">Temizle</button>
         </div>
         
         <div class="history-list" id="historyList">
           <div class="history-empty" id="historyEmpty">
             <span class="empty-icon">📝</span>
-            <div class="empty-text">Henüz optimizasyon geçmişi yok</div>
-            <div class="empty-subtitle">Bir metni seçip optimize etmeye başlayın</div>
+            <div class="empty-text">Henüz prompt iyileştirme geçmişi yok</div>
+            <div class="empty-subtitle">Bir prompt seçip iyileştirmeye başlayın</div>
           </div>
         </div>
       </section>
@@ -102,7 +94,6 @@
     <footer class="popup-footer">
       <div class="footer-links">
         <a href="#" class="footer-link" id="openSettings">⚙️ Ayarlar</a>
-        <a href="#" class="footer-link" id="openDebug">🔬 Debug</a>
         <a href="https://buymeacoffee.com/promptoptimizer" target="_blank" class="footer-link support-link">
           ☕ Kahve ısmarla
         </a>

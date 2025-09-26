@@ -53,10 +53,6 @@ class PopupManager {
       this.instantOptimizeText();
     });
 
-    document.getElementById('showHistory').addEventListener('click', () => {
-      this.showFullHistory();
-    });
-
     // History management
     document.getElementById('clearHistory').addEventListener('click', () => {
       this.clearHistory();
@@ -66,11 +62,6 @@ class PopupManager {
     document.getElementById('openSettings').addEventListener('click', (e) => {
       e.preventDefault();
       this.openSettingsPage();
-    });
-
-    document.getElementById('openDebug').addEventListener('click', (e) => {
-      e.preventDefault();
-      this.openDebugPage();
     });
 
     // Close popup when clicking outside (for debugging)
@@ -181,43 +172,41 @@ class PopupManager {
       
       historyList.innerHTML = historyHTML;
       
-      // Add click listeners to history items for copying
-      historyList.querySelectorAll('.history-item').forEach(item => {
-        item.addEventListener('click', async () => {
-          const historyId = parseInt(item.dataset.historyId);
-          const historyItem = history.find(h => h.id === historyId);
+      // Add click listeners to copy buttons
+      historyList.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation(); // Prevent history item click
           
-          if (historyItem) {
-            // Remove selected class from all items
-            historyList.querySelectorAll('.history-item').forEach(i => i.classList.remove('selected'));
+          const textToCopy = btn.dataset.text;
+          const copyType = btn.dataset.copy; // 'original' or 'optimized'
+          
+          try {
+            await navigator.clipboard.writeText(textToCopy);
             
-            // Add selected class to clicked item
-            item.classList.add('selected');
+            // Visual feedback
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Kopyalandı!';
+            btn.style.background = '#22c55e';
             
-            try {
-              await navigator.clipboard.writeText(historyItem.original);
-              this.showToast('Orijinal metin kopyalandı!', 'success');
-              
-              // Remove selected class after animation
-              setTimeout(() => {
-                item.classList.remove('selected');
-              }, 1500);
-            } catch (error) {
-              // Fallback for clipboard API
-              const textArea = document.createElement('textarea');
-              textArea.value = historyItem.original;
-              document.body.appendChild(textArea);
-              textArea.select();
-              document.execCommand('copy');
-              document.body.removeChild(textArea);
-              
-              this.showToast('Metin kopyalandı!', 'success');
-              
-              // Remove selected class after animation
-              setTimeout(() => {
-                item.classList.remove('selected');
-              }, 1500);
-            }
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.background = '';
+            }, 1500);
+            
+            this.showToast(
+              copyType === 'original' ? 'Orijinal prompt kopyalandı!' : 'İyileştirilmiş prompt kopyalandı!', 
+              'success'
+            );
+          } catch (error) {
+            // Fallback for clipboard API
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            this.showToast('Metin kopyalandı!', 'success');
           }
         });
       });
@@ -235,9 +224,13 @@ class PopupManager {
       minute: '2-digit'
     });
     
-    const preview = item.original.length > 80 
-      ? item.original.substring(0, 80) + '...'
+    const originalPreview = item.original.length > 100 
+      ? item.original.substring(0, 100) + '...'
       : item.original;
+      
+    const optimizedPreview = item.optimized.length > 100 
+      ? item.optimized.substring(0, 100) + '...'
+      : item.optimized;
       
     const improvement = this.calculateImprovementText(item.original.length, item.optimized.length);
     const toneText = this.getToneText(item.options?.tone || 'neutral');
@@ -246,12 +239,32 @@ class PopupManager {
       <div class="history-item" data-history-id="${item.id}">
         <div class="history-header">
           <div class="history-date">${formattedDate}</div>
-          <div class="copy-hint">Tıkla & Kopyala</div>
+          <div class="history-stats">
+            <span class="history-stat">${improvement}</span>
+            <span class="history-stat">${toneText}</span>
+          </div>
         </div>
-        <div class="history-preview">${this.escapeHtml(preview)}</div>
-        <div class="history-stats">
-          <span class="history-stat">${improvement}</span>
-          <span class="history-stat">${toneText}</span>
+        
+        <div class="history-content">
+          <div class="history-section">
+            <div class="history-section-header">
+              <span class="history-label">📝 Orijinal:</span>
+              <button class="copy-btn" data-copy="original" data-text="${this.escapeHtml(item.original)}" title="Orijinali kopyala">
+                📋 Kopyala
+              </button>
+            </div>
+            <div class="history-preview original">${this.escapeHtml(originalPreview)}</div>
+          </div>
+          
+          <div class="history-section">
+            <div class="history-section-header">
+              <span class="history-label">✨ İyileştirilmiş:</span>
+              <button class="copy-btn" data-copy="optimized" data-text="${this.escapeHtml(item.optimized)}" title="İyileştirilmiş prompt'u kopyala">
+                📋 Kopyala
+              </button>
+            </div>
+            <div class="history-preview optimized">${this.escapeHtml(optimizedPreview)}</div>
+          </div>
         </div>
       </div>
     `;
@@ -388,13 +401,6 @@ class PopupManager {
     }
   }
 
-  showFullHistory() {
-    // Open history page in new tab
-    chrome.tabs.create({
-      url: chrome.runtime.getURL('src/history.html')
-    });
-  }
-
   async clearHistory() {
     if (confirm('Tüm geçmiş silinsin mi? Bu işlem geri alınamaz.')) {
       try {
@@ -408,20 +414,9 @@ class PopupManager {
     }
   }
 
-  showHistoryDetails(historyId) {
-    // Open history details or show in modal
-    // Implementation would open detailed view
-  }
-
   openSettingsPage() {
     chrome.tabs.create({
       url: chrome.runtime.getURL('src/settings.html')
-    });
-  }
-
-  openDebugPage() {
-    chrome.tabs.create({
-      url: chrome.runtime.getURL('src/debug.html')
     });
   }
 

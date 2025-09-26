@@ -125,7 +125,7 @@ class BackgroundManager {
     const selectedText = info.selectionText?.trim();
     
     if (!selectedText) {
-      this.showNotification('Lütfen optimize edilecek metni seçin.', 'warning');
+      this.showNotification('Lütfen iyileştirilecek prompt\'u seçin.', 'warning');
       return;
     }
 

@@ -117,14 +117,14 @@ class GeminiAPI {
   buildOptimizationPrompt(text, options) {
     const { tone, language, style, length } = options;
     
-    let prompt = `Lütfen aşağıdaki metni optimize et:\n\n"${text}"\n\n`;
+    let prompt = `Sen bir prompt iyileştirme uzmanısın. Görevin verilen prompt'u yapay zeka modellerinin daha iyi anlayıp işleyebileceği şekilde iyileştirmek.\n\nÖNEMLİ: Metni kısaltma veya özetleme! Sadece AI'ın anlayacağı şekilde yeniden yazıp iyileştir.\n\nİyileştirilecek prompt:\n"${text}"\n\n`;
     
-    prompt += `Optimizasyon kriterleri:\n`;
+    prompt += `İyileştirme kriterleri:\n`;
     
     // Ton ayarları
     switch (tone) {
       case 'formal':
-        prompt += `- Resmi ve profesyonel bir ton kullan\n`;
+        prompt += `- Resmi ve profesyonel bir dil kullan\n`;
         break;
       case 'casual':
         prompt += `- Samimi ve günlük bir dil kullan\n`;
@@ -133,22 +133,22 @@ class GeminiAPI {
         prompt += `- Teknik ve detaylı bir yaklaşım benimse\n`;
         break;
       case 'concise':
-        prompt += `- Kısa ve öz bir şekilde ifade et\n`;
+        prompt += `- Kısa ve net bir şekilde ifade et (ama içeriği koruyarak)\n`;
         break;
       default:
-        prompt += `- Dengeli ve net bir ton kullan\n`;
+        prompt += `- Dengeli ve anlaşılır bir ton kullan\n`;
     }
     
     // Uzunluk ayarları
     switch (length) {
       case 'shorter':
-        prompt += `- Orijinalden daha kısa yap\n`;
+        prompt += `- Gereksiz tekrarları ve belirsizlikleri kaldır, ama ana mesajı koru\n`;
         break;
       case 'longer':
-        prompt += `- Daha ayrıntılı ve açıklayıcı yap\n`;
+        prompt += `- Daha ayrıntılı ve kapsamlı açıklamalar ekle\n`;
         break;
       default:
-        prompt += `- Benzer uzunlukta tut\n`;
+        prompt += `- Benzer detay seviyesinde tut, sadece netliği artır\n`;
     }
     
     // Dil ayarları
@@ -160,7 +160,14 @@ class GeminiAPI {
       prompt += `- Orijinal metnin dilinde yanıtla\n`;
     }
     
-    prompt += `\nSadece optimize edilmiş metni döndür, ek açıklama yapma.`;
+    prompt += `\nPrompt iyileştirme hedeflerin:\n`;
+    prompt += `✓ Belirsizlikleri gider ve net talimatlar ver\n`;
+    prompt += `✓ Context ve bağlam bilgilerini netleştir\n`;
+    prompt += `✓ AI'ın anlayacağı açık ve yapılandırılmış format kullan\n`;
+    prompt += `✓ Gereksiz kelimelerden arındır ama içeriği koru\n`;
+    prompt += `✓ Daha spesifik ve actionable (eyleme dönük) hale getir\n\n`;
+    
+    prompt += `Sadece iyileştirilmiş prompt'u döndür. Ek açıklama, yorum veya format eklemeden direkt metni ver.`;
     
     return prompt;
   }

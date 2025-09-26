@@ -91,7 +91,7 @@ class ContentManager {
       optimizer.classList.add('po-visible');
     });
 
-    // Direkt optimizasyonu başlat
+    // Direkt iyileştirmeyi başlat
     this.optimizeText(optimizer, text, options);
   }
 
@@ -138,7 +138,7 @@ class ContentManager {
             </div>
             <div class="po-text po-loading">
               <div class="po-spinner"></div>
-              <span>AI ile optimize ediliyor...</span>
+              <span>AI ile iyileştiriliyor...</span>
             </div>
           </div>
         </div>
@@ -187,7 +187,8 @@ class ContentManager {
           
           <button class="po-btn po-btn-primary po-copy-optimized" disabled>
             <span class="po-btn-icon">✨</span>
-            İyileştirmiş Kopyala
+            İyileştirileni Kopyala
+          </button>
           </button>
         </div>
         
@@ -222,16 +223,9 @@ class ContentManager {
     const lengthSelect = optimizer.querySelector('.po-length-select');
     const languageSelect = optimizer.querySelector('.po-language');
 
-    console.log('🎯 Select elementleri:', {
-      toneSelect: !!toneSelect,
-      lengthSelect: !!lengthSelect,
-      languageSelect: !!languageSelect
-    });
-
     // Ton değişikliği
     if (toneSelect) {
       toneSelect.addEventListener('change', (e) => {
-        console.log('🎵 Ton değişti:', e.target.value);
         const newOptions = {
           tone: toneSelect.value,
           length: lengthSelect?.value || 'maintain',
@@ -244,7 +238,6 @@ class ContentManager {
     // Uzunluk değişikliği
     if (lengthSelect) {
       lengthSelect.addEventListener('change', (e) => {
-        console.log('📏 Uzunluk değişti:', e.target.value);
         const newOptions = {
           tone: toneSelect?.value || 'neutral',
           length: lengthSelect.value,
@@ -257,7 +250,6 @@ class ContentManager {
     // Dil değişikliği
     if (languageSelect) {
       languageSelect.addEventListener('change', (e) => {
-        console.log('🌍 Dil değişti:', e.target.value);
         const newOptions = {
           tone: toneSelect?.value || 'neutral',
           length: lengthSelect?.value || 'maintain',
@@ -274,18 +266,17 @@ class ContentManager {
         length: lengthSelect?.value || 'maintain',
         language: languageSelect?.value || 'auto'
       };
-      console.log('🔄 Yeniden dene butonu - seçenekler:', options);
       this.optimizeText(optimizer, originalText, options);
     });
 
     // Kopyala butonları
     optimizer.querySelector('.po-copy-original').addEventListener('click', () => {
-      this.copyToClipboard(originalText, 'Orijinal metin kopyalandı!');
+      this.copyToClipboard(originalText, 'Orijinal prompt kopyalandı!');
     });
 
     optimizer.querySelector('.po-copy-optimized').addEventListener('click', () => {
       const optimizedText = optimizer.querySelector('.po-optimized .po-text').textContent;
-      this.copyToClipboard(optimizedText, 'İyileştirilmiş metin kopyalandı!');
+      this.copyToClipboard(optimizedText, 'İyileştirilmiş prompt kopyalandı!');
     });
 
     // Support link
@@ -343,7 +334,7 @@ class ContentManager {
         copyBtn.disabled = false;
 
       } else {
-        throw new Error(response.error || 'Bilinmeyen optimizasyon hatası');
+        throw new Error(response.error || 'Bilinmeyen iyileştirme hatası');
       }
 
     } catch (error) {
@@ -458,16 +449,16 @@ class ContentManager {
         this.replaceSelectedText(response.data.optimized);
         
         this.hideInstantOptimizeLoader();
-        this.showToast('✨ Metin optimize edildi! (Ctrl+Z ile geri al)', 3000, 'success');
+        this.showToast('✨ Prompt iyileştirildi! (Ctrl+Z ile geri al)', 3000, 'success');
         
         return { success: true };
       } else {
-        throw new Error(response?.error || 'Optimizasyon başarısız');
+        throw new Error(response?.error || 'İyileştirme başarısız');
       }
     } catch (error) {
       console.error('Instant optimize error:', error);
       this.hideInstantOptimizeLoader();
-      this.showToast('❌ Optimizasyon başarısız: ' + error.message, 3000, 'error');
+      this.showToast('❌ İyileştirme başarısız: ' + error.message, 3000, 'error');
       return { success: false, error: error.message };
     }
   }
