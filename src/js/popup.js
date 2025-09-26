@@ -255,24 +255,30 @@ class PopupManager {
         </div>
         
         <div class="history-content">
-          <div class="history-section">
+          <div class="history-section original">
             <div class="history-section-header">
-              <span class="history-label">📝 Orijinal:</span>
+              <span class="history-label">
+                <span class="emoji">📝</span>
+                Orijinal Prompt
+              </span>
               <button class="copy-btn" data-copy="original" data-text="${this.escapeHtml(item.original)}" title="Orijinali kopyala">
                 📋 Kopyala
               </button>
             </div>
-            <div class="history-preview original">${this.escapeHtml(originalPreview)}</div>
+            <div class="history-preview">${this.escapeHtml(originalPreview)}</div>
           </div>
           
-          <div class="history-section">
+          <div class="history-section optimized">
             <div class="history-section-header">
-              <span class="history-label">✨ İyileştirilmiş:</span>
+              <span class="history-label">
+                <span class="emoji">✨</span>
+                İyileştirilmiş Prompt
+              </span>
               <button class="copy-btn" data-copy="optimized" data-text="${this.escapeHtml(item.optimized)}" title="İyileştirilmiş prompt'u kopyala">
                 📋 Kopyala
               </button>
             </div>
-            <div class="history-preview optimized">${this.escapeHtml(optimizedPreview)}</div>
+            <div class="history-preview">${this.escapeHtml(optimizedPreview)}</div>
           </div>
         </div>
       </div>
