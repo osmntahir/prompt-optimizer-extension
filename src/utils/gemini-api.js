@@ -167,16 +167,32 @@ class GeminiAPI {
     prompt += `✓ Gereksiz kelimelerden arındır ama içeriği koru\n`;
     prompt += `✓ Daha spesifik ve actionable (eyleme dönük) hale getir\n\n`;
     
-    prompt += `Sadece iyileştirilmiş prompt'u döndür. Ek açıklama, yorum veya format eklemeden direkt metni ver.`;
+    prompt += `ÖNEMLİ: Sadece iyileştirilmiş prompt'u döndür. Tırnak işareti, kod bloğu, açıklama veya ek format kullanma. Direkt metni ver.`;
     
     return prompt;
   }
 
   cleanOptimizedText(text) {
     // Gereksiz karakterleri ve formatlamayı temizle
-    return text
-      .replace(/^["']|["']$/g, '') // Başındaki ve sonundaki tırnak işaretlerini kaldır
-      .trim();
+    let cleaned = text.trim();
+    
+    // Başındaki ve sonundaki tırnak işaretlerini kaldır (tek veya çift tırnak)
+    // Birden fazla kez uygula (iç içe tırnaklar için)
+    while (cleaned.startsWith('"') || cleaned.startsWith("'") || cleaned.startsWith('"') || cleaned.startsWith('"')) {
+      cleaned = cleaned.substring(1);
+    }
+    while (cleaned.endsWith('"') || cleaned.endsWith("'") || cleaned.endsWith('"') || cleaned.endsWith('"')) {
+      cleaned = cleaned.substring(0, cleaned.length - 1);
+    }
+    
+    // Markdown kod bloklarını kaldır
+    cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
+    cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
+    
+    // Fazladan boşlukları temizle
+    cleaned = cleaned.trim();
+    
+    return cleaned;
   }
 
   // Dil algılama

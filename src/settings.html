@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,20 +16,20 @@
       padding: 0;
       overflow-y: auto;
     }
-    
+
     .settings-container {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
-    
+
     .settings-content {
       flex: 1;
       padding: 20px;
       max-width: 800px;
       margin: 0 auto;
     }
-    
+
     .settings-section {
       background: #2a2a3e;
       margin: 20px 0;
@@ -36,7 +37,7 @@
       border-radius: 12px;
       border: 1px solid #444;
     }
-    
+
     .settings-section h3 {
       color: #E0E0E0;
       font-size: 18px;
@@ -45,36 +46,36 @@
       align-items: center;
       gap: 8px;
     }
-    
+
     .setting-item {
       margin: 16px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .setting-label {
       display: flex;
       flex-direction: column;
       flex: 1;
     }
-    
+
     .setting-title {
       color: #E0E0E0;
       font-weight: 500;
       margin-bottom: 4px;
     }
-    
+
     .setting-description {
       color: #A0A0A0;
       font-size: 12px;
       line-height: 1.4;
     }
-    
+
     .setting-control {
       margin-left: 20px;
     }
-    
+
     .toggle-switch {
       position: relative;
       width: 50px;
@@ -84,11 +85,11 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-    
+
     .toggle-switch.active {
       background: #667eea;
     }
-    
+
     .toggle-switch::after {
       content: '';
       position: absolute;
@@ -100,11 +101,11 @@
       border-radius: 50%;
       transition: transform 0.3s;
     }
-    
+
     .toggle-switch.active::after {
       transform: translateX(26px);
     }
-    
+
     .select-input {
       background: #1e1e2e;
       border: 1px solid #444;
@@ -114,12 +115,12 @@
       font-size: 14px;
       min-width: 120px;
     }
-    
+
     .select-input:focus {
       outline: none;
       border-color: #667eea;
     }
-    
+
     .number-input {
       background: #1e1e2e;
       border: 1px solid #444;
@@ -130,12 +131,12 @@
       width: 80px;
       text-align: center;
     }
-    
+
     .number-input:focus {
       outline: none;
       border-color: #667eea;
     }
-    
+
     .back-button {
       position: fixed;
       top: 20px;
@@ -152,11 +153,11 @@
       gap: 8px;
       z-index: 100;
     }
-    
+
     .back-button:hover {
       background: #5a6de8;
     }
-    
+
     .coffee-link {
       text-decoration: none;
       color: inherit;
@@ -166,28 +167,29 @@
       padding: 2px 4px;
       border-radius: 4px;
     }
-    
+
     .coffee-link:hover {
       transform: scale(1.1);
       opacity: 0.8;
       background: rgba(255, 255, 255, 0.1);
     }
-    
+
     .coffee-link:active {
       transform: scale(0.95);
     }
-    
+
     .version-section {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    
+
     .coffee-icon {
       font-size: 16px;
     }
   </style>
 </head>
+
 <body>
   <div class="settings-container">
     <!-- Header -->
@@ -198,7 +200,8 @@
       </div>
       <div class="version-section">
         <div class="version">v1.0.0</div>
-        <a href="https://buymeacoffee.com/osmntahir" target="_blank" class="coffee-link" title="Bana bir kahve ısmarla ☕">
+        <a href="https://buymeacoffee.com/osmntahir" target="_blank" class="coffee-link"
+          title="Bana bir kahve ısmarla ☕">
           <span class="coffee-icon">☕</span>
         </a>
       </div>
@@ -208,7 +211,7 @@
       <!-- İyileştirme Ayarları -->
       <div class="settings-section">
         <h3>🎯 İyileştirme Ayarları</h3>
-        
+
         <div class="setting-item">
           <div class="setting-label">
             <div class="setting-title">Varsayılan Ton</div>
@@ -224,7 +227,7 @@
             </select>
           </div>
         </div>
-        
+
         <div class="setting-item">
           <div class="setting-label">
             <div class="setting-title">Otomatik İyileştirme</div>
@@ -239,27 +242,17 @@
       <!-- Geçmiş Ayarları -->
       <div class="settings-section">
         <h3>📚 Geçmiş Ayarları</h3>
-        
+
         <div class="setting-item">
           <div class="setting-label">
             <div class="setting-title">Geçmiş Kaydetme</div>
-            <div class="setting-description">İyileştirme geçmişini kaydet ve saklasın</div>
+            <div class="setting-description">İyileştirme geçmişini kaydet ve saklasın (Maksimum 10 kayıt)</div>
           </div>
           <div class="setting-control">
             <div class="toggle-switch active" id="saveHistory"></div>
           </div>
         </div>
-        
-        <div class="setting-item">
-          <div class="setting-label">
-            <div class="setting-title">Maksimum Geçmiş</div>
-            <div class="setting-description">Saklanacak maksimum geçmiş kayıt sayısı</div>
-          </div>
-          <div class="setting-control">
-            <input type="number" class="number-input" id="maxHistory" min="5" max="50" value="10">
-          </div>
-        </div>
-        
+
         <div class="setting-item">
           <div class="setting-label">
             <div class="setting-title">Geçmiş Temizle</div>
@@ -274,7 +267,7 @@
       <!-- Bildirim Ayarları -->
       <div class="settings-section">
         <h3>🔔 Bildirim Ayarları</h3>
-        
+
         <div class="setting-item">
           <div class="setting-label">
             <div class="setting-title">Başarı Bildirimleri</div>
@@ -284,7 +277,7 @@
             <div class="toggle-switch active" id="showSuccessNotifications"></div>
           </div>
         </div>
-        
+
         <div class="setting-item">
           <div class="setting-label">
             <div class="setting-title">Hata Bildirimleri</div>
@@ -303,4 +296,5 @@
 
   <script src="js/settings.js"></script>
 </body>
+
 </html>

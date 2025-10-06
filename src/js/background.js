@@ -105,7 +105,7 @@ class BackgroundManager {
           sendResponse({ success: false, error: error.message });
         }
       })();
-      
+
       // Return true for async response
       return true;
     });
@@ -122,15 +122,15 @@ class BackgroundManager {
 
   async handleContextMenuClick(info, tab) {
     const selectedText = info.selectionText?.trim();
-    
+
     if (!selectedText) {
-      this.showNotification('Lütfen iyileştirilecek prompt\'u seçin.', 'warning');
+      console.log('No text selected');
       return;
     }
 
     // Menu ID'sine göre seçenekleri belirle
     const options = this.getOptionsFromMenuId(info.menuItemId);
-    
+
     try {
       // Content script'e optimizasyon isteği gönder
       await chrome.tabs.sendMessage(tab.id, {
@@ -140,65 +140,24 @@ class BackgroundManager {
         source: 'contextMenu'
       });
     } catch (error) {
-      // If content script not loaded, try to inject
-      try {
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['src/js/content.js']
-        });
-        await chrome.scripting.insertCSS({
-          target: { tabId: tab.id },
-          files: ['src/css/content.css']
-        });
-        // Retry the message
-        await chrome.tabs.sendMessage(tab.id, {
-          action: 'showOptimizer',
-          text: selectedText,
-          options: options,
-          source: 'contextMenu'
-        });
-      } catch (injectError) {
-        this.showNotification('Bu sayfada extension çalışmıyor', 'error');
-      }
+      console.error('Context menu click error:', error);
     }
   }
 
   async handleInstantOptimizeShortcut() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
-      // Check if content script is injected
-      try {
-        await chrome.tabs.sendMessage(tab.id, { action: 'ping' });
-      } catch (pingError) {
-        // Content script not loaded, inject it
-        try {
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['src/js/content.js']
-          });
-          await chrome.scripting.insertCSS({
-            target: { tabId: tab.id },
-            files: ['src/css/content.css']
-          });
-          // Wait for script to initialize
-          await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (injectError) {
-          this.showNotification('Bu sayfada extension çalışmıyor', 'error');
-          return;
-        }
-      }
-      
+
       // Content script'e instant optimize mesajı gönder
       const response = await chrome.tabs.sendMessage(tab.id, {
         action: 'instantOptimize'
       });
 
       if (!response?.success) {
-        this.showNotification('Lütfen optimize edilecek metni seçin.', 'warning');
+        console.log('No text selected for instant optimize');
       }
     } catch (error) {
-      this.showNotification('Bir hata oluştu. Sayfayı yenileyin.', 'error');
+      console.error('Instant optimize error:', error);
     }
   }
 
@@ -234,10 +193,10 @@ class BackgroundManager {
               language: options.language || 'auto'
             };
 
-            console.log('📝 API çağrısı yapılacak:', { 
-              textLength: text.length, 
+            console.log('📝 API çağrısı yapılacak:', {
+              textLength: text.length,
               options: normalizedOptions,
-              apiExists: !!this.geminiAPI 
+              apiExists: !!this.geminiAPI
             });
 
             // Gemini API çağrısı
@@ -247,7 +206,7 @@ class BackgroundManager {
               optimizedLength: optimizedText?.length,
               hasResult: !!optimizedText
             });
-            
+
             if (!optimizedText || typeof optimizedText !== 'string') {
               throw new Error('API geçersiz metin döndürdü');
             }
@@ -286,10 +245,10 @@ class BackgroundManager {
 
         case 'clearHistory':
           await this.storageManager.clearHistory();
-          
+
           // Broadcast to all components that history was cleared
           this.broadcastHistoryCleared();
-          
+
           sendResponse({ success: true });
           break;
 
@@ -310,9 +269,9 @@ class BackgroundManager {
     } catch (error) {
       // Hata istatistiği
       if (request?.text) {
-        try { 
-          await this.storageManager.updateStats(false, request.text.length); 
-        } catch (statError) {}
+        try {
+          await this.storageManager.updateStats(false, request.text.length);
+        } catch (statError) { }
       }
       sendResponse({ success: false, error: error.message });
     }
@@ -320,7 +279,7 @@ class BackgroundManager {
 
   async saveToHistory(original, optimized, options) {
     const preferences = await this.storageManager.getPreferences();
-    
+
     if (preferences.saveHistory) {
       await this.storageManager.addToHistory(original, optimized, options);
     }
@@ -339,7 +298,7 @@ class BackgroundManager {
   calculateImprovement(originalLength, optimizedLength) {
     const difference = optimizedLength - originalLength;
     const percentage = ((difference / originalLength) * 100).toFixed(1);
-    
+
     if (difference > 0) {
       return `+${percentage}% uzun`;
     } else if (difference < 0) {
@@ -360,19 +319,6 @@ class BackgroundManager {
     };
 
     return optionsMap[menuItemId] || { tone: 'neutral' };
-  }
-
-  showNotification(message, type = 'info') {
-    try {
-      chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'src/icons/icon48.png',
-        title: 'Prompt Optimizer',
-        message: message
-      });
-    } catch (e) {
-      console.warn('Notification error:', e?.message);
-    }
   }
 
   async handleFirstInstall() {

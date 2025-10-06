@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -215,6 +216,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="welcome-container">
     <span class="logo">✨</span>
@@ -260,15 +262,17 @@
       <p style="margin-bottom: 20px; color: #059669; font-weight: 500; font-size: 18px;">
         Prompt Optimizer başarıyla kuruldu ve kullanıma hazır!
       </p>
-      
-      <div style="background: #d1fae5; border: 2px solid #a7f3d0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+
+      <div
+        style="background: #d1fae5; border: 2px solid #a7f3d0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
           <span style="color: #065f46; font-size: 24px;">✅</span>
           <span style="color: #065f46; font-weight: 600; font-size: 16px;">Eklenti aktif ve kullanıma hazır!</span>
         </div>
       </div>
 
-      <div style="background: #e0f2fe; border: 2px solid #81d4fa; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+      <div
+        style="background: #e0f2fe; border: 2px solid #81d4fa; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
         <h3 style="color: #01579b; margin-bottom: 12px; font-size: 18px;">🚀 Nasıl Kullanılır?</h3>
         <div style="color: #0277bd; font-weight: 500; line-height: 1.8;">
           <p style="margin-bottom: 8px;">1. Herhangi bir web sayfasında metin seçin</p>
@@ -280,9 +284,12 @@
     </div>
 
     <div class="actions" style="margin-top: 30px;">
-      <div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 12px; border: 2px solid #e2e8f0;">
-        <p style="color: #475569; font-size: 16px; margin-bottom: 12px;">Bu sekmeyi kapatıp hemen denemeye başlayabilirsiniz!</p>
-        <p style="color: #64748b; font-size: 14px;">Herhangi bir sorunuz varsa eklenti ayarlarından destek bölümüne ulaşabilirsiniz.</p>
+      <div
+        style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 12px; border: 2px solid #e2e8f0;">
+        <p style="color: #475569; font-size: 16px; margin-bottom: 12px;">Bu sekmeyi kapatıp hemen denemeye
+          başlayabilirsiniz!</p>
+        <p style="color: #64748b; font-size: 14px;">Herhangi bir sorunuz varsa eklenti ayarlarından destek bölümüne
+          ulaşabilirsiniz.</p>
       </div>
     </div>
   </div>
@@ -291,7 +298,7 @@
     // Simple welcome page - no complex functionality needed
     document.addEventListener('DOMContentLoaded', () => {
       console.log('Prompt Optimizer Welcome Page Loaded');
-      
+
       // Add some interactive animation to the logo
       const logo = document.querySelector('.logo');
       if (logo) {
@@ -303,7 +310,7 @@
           }, 200);
         });
       }
-      
+
       // Auto-hide this page after 10 seconds if user doesn't interact
       setTimeout(() => {
         if (document.hasFocus() === false) {
@@ -313,4 +320,5 @@
     });
   </script>
 </body>
+
 </html>

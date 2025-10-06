@@ -7,9 +7,9 @@ class SettingsManager {
   constructor() {
     this.defaultSettings = {
       defaultTone: 'neutral',
-      autoOptimize: false,
+      autoOptimize: false, // Default olarak kapalı
       saveHistory: true,
-      maxHistory: 10,
+      maxHistory: 10, // Sabit değer
       showSuccessNotifications: true,
       showErrorNotifications: true
     };
@@ -25,10 +25,10 @@ class SettingsManager {
     try {
       const result = await chrome.storage.sync.get(['userPreferences']);
       const settings = { ...this.defaultSettings, ...(result.userPreferences || {}) };
-      
+
       // Update UI with current settings
       this.updateUI(settings);
-      
+
     } catch (error) {
       console.error('Settings load error:', error);
       this.showToast('Ayarlar yüklenemedi', 'error');
@@ -38,8 +38,7 @@ class SettingsManager {
   updateUI(settings) {
     // Dropdown ayarları
     document.getElementById('defaultTone').value = settings.defaultTone;
-    document.getElementById('maxHistory').value = settings.maxHistory;
-    
+
     // Toggle ayarları
     this.setToggleState('autoOptimize', settings.autoOptimize);
     this.setToggleState('saveHistory', settings.saveHistory);
@@ -97,9 +96,9 @@ class SettingsManager {
   async saveSettings(showFeedback = true) {
     try {
       const settings = this.getFormValues();
-      
+
       await chrome.storage.sync.set({ userPreferences: settings });
-      
+
       if (showFeedback) {
         this.showToast('Ayarlar kaydedildi', 'success');
       }
@@ -114,7 +113,7 @@ class SettingsManager {
       defaultTone: document.getElementById('defaultTone').value,
       autoOptimize: document.getElementById('autoOptimize').classList.contains('active'),
       saveHistory: document.getElementById('saveHistory').classList.contains('active'),
-      maxHistory: parseInt(document.getElementById('maxHistory').value) || 10,
+      maxHistory: 10, // Sabit değer
       showSuccessNotifications: document.getElementById('showSuccessNotifications').classList.contains('active'),
       showErrorNotifications: document.getElementById('showErrorNotifications').classList.contains('active')
     };
@@ -125,7 +124,7 @@ class SettingsManager {
     const toast = document.createElement('div');
     toast.className = `settings-toast settings-toast-${type}`;
     toast.textContent = message;
-    
+
     // Style the toast
     Object.assign(toast.style, {
       position: 'fixed',
@@ -141,7 +140,7 @@ class SettingsManager {
       transition: 'transform 0.3s ease',
       maxWidth: '300px'
     });
-    
+
     // Set background color based on type
     const colors = {
       'success': '#10b981',
@@ -150,14 +149,14 @@ class SettingsManager {
       'info': '#3b82f6'
     };
     toast.style.background = colors[type] || colors.info;
-    
+
     document.body.appendChild(toast);
-    
+
     // Animate in
     setTimeout(() => {
       toast.style.transform = 'translateX(0)';
     }, 10);
-    
+
     // Auto remove after 3 seconds
     setTimeout(() => {
       toast.style.transform = 'translateX(100%)';

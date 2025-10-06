@@ -10,6 +10,7 @@ class ContentManager {
     this.selectedText = '';
     this.originalTextBackup = null; // Ctrl+Z için backup
     this.selectedRange = null; // Selection range backup
+    this.selectionTimeout = null; // Auto-optimize için debounce
     this.init();
   }
 
@@ -61,7 +62,31 @@ class ContentManager {
   setupSelectionListener() {
     // Metin seçimi değişikliklerini dinle
     document.addEventListener('selectionchange', () => {
-      this.selectedText = window.getSelection().toString().trim();
+      const newSelectedText = window.getSelection().toString().trim();
+      this.selectedText = newSelectedText;
+
+      // Auto-optimize kontrolü
+      if (this.selectionTimeout) {
+        clearTimeout(this.selectionTimeout);
+      }
+
+      // En az 10 karakter seçilmişse ve optimizer açık değilse
+      if (newSelectedText.length >= 10 && !this.isOptimizerVisible) {
+        this.selectionTimeout = setTimeout(async () => {
+          // Ayarları kontrol et
+          try {
+            const result = await chrome.storage.sync.get(['userPreferences']);
+            const autoOptimize = result.userPreferences?.autoOptimize || false;
+
+            // Auto-optimize aktifse optimizer'ı göster
+            if (autoOptimize && newSelectedText.length >= 10) {
+              this.showOptimizer(newSelectedText, {}, 'autoOptimize');
+            }
+          } catch (error) {
+            console.error('Auto-optimize check error:', error);
+          }
+        }, 800); // 800ms debounce
+      }
     });
 
     // Keyboard shortcuts
@@ -71,7 +96,7 @@ class ContentManager {
         this.hideOptimizer();
         return;
       }
-      
+
       // Ctrl+Z ile instant optimize geri al
       if (e.ctrlKey && e.key === 'z' && this.originalTextBackup && this.selectedRange) {
         e.preventDefault();
@@ -88,11 +113,11 @@ class ContentManager {
     }
 
     this.selectedText = text;
-    
+
     // Optimizer UI oluştur
     const optimizer = this.createOptimizerUI(text, options, source);
     document.body.appendChild(optimizer);
-    
+
     this.currentOptimizer = optimizer;
     this.isOptimizerVisible = true;
 
@@ -108,7 +133,7 @@ class ContentManager {
   hideOptimizer() {
     if (this.currentOptimizer) {
       this.currentOptimizer.classList.add('po-hiding');
-      
+
       setTimeout(() => {
         if (this.currentOptimizer && this.currentOptimizer.parentNode) {
           this.currentOptimizer.parentNode.removeChild(this.currentOptimizer);
@@ -323,12 +348,12 @@ class ContentManager {
 
       if (response.success && response.data) {
         const { optimized, stats } = response.data;
-        
+
         // Başarılı sonuç göster
         optimizedSection.textContent = optimized;
         optimizedSection.className = 'po-text po-success';
         optimizedLength.textContent = `${optimized.length} karakter`;
-        
+
         // İstatistikleri göster
         statsDiv.innerHTML = `
           <span class="po-stat">
@@ -350,7 +375,7 @@ class ContentManager {
     } catch (error) {
       // Hata durumu
       let errorMessage = error.message || 'Bilinmeyen hata';
-      
+
       // Kullanıcı dostu hata mesajları
       if (errorMessage.includes('Extension context invalidated')) {
         errorMessage = 'Extension yenilendi. Sayfayı yenileyin.';
@@ -407,9 +432,9 @@ class ContentManager {
     const toast = document.createElement('div');
     toast.className = `po-toast po-toast-${type}`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     requestAnimationFrame(() => {
       toast.classList.add('po-toast-visible');
     });
@@ -434,7 +459,7 @@ class ContentManager {
   async handleInstantOptimize() {
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
-    
+
     if (!selectedText) {
       return { success: false, message: 'Metin seçilmedi' };
     }
@@ -443,14 +468,14 @@ class ContentManager {
       // Selection range'i kaydet (Ctrl+Z için)
       this.selectedRange = selection.getRangeAt(0).cloneRange();
       this.originalTextBackup = selectedText;
-      
+
       // Loading indicator göster
       this.showInstantOptimizeLoader();
-      
+
       // Get user preferences for default tone
       const preferences = await chrome.storage.sync.get(['userPreferences']);
       const defaultTone = preferences.userPreferences?.defaultTone || 'neutral';
-      
+
       // Optimize et
       const response = await chrome.runtime.sendMessage({
         action: 'optimizeText',
@@ -461,10 +486,10 @@ class ContentManager {
       if (response?.success && response.data?.optimized) {
         // Seçili metni optimize edilmiş halle değiştir
         this.replaceSelectedText(response.data.optimized);
-        
+
         this.hideInstantOptimizeLoader();
         this.showToast('✨ Prompt iyileştirildi! (Ctrl+Z ile geri al)', 3000, 'success');
-        
+
         return { success: true };
       } else {
         throw new Error(response?.error || 'İyileştirme başarısız');
@@ -481,11 +506,11 @@ class ContentManager {
     if (this.selectedRange) {
       // Seçili alanı sil ve yeni metni ekle
       this.selectedRange.deleteContents();
-      
+
       // Text node oluştur ve ekle
       const textNode = document.createTextNode(newText);
       this.selectedRange.insertNode(textNode);
-      
+
       // Yeni metni seç (görsel feedback için)
       const newSelection = window.getSelection();
       newSelection.removeAllRanges();
@@ -502,10 +527,10 @@ class ContentManager {
       if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         range.deleteContents();
-        
+
         const textNode = document.createTextNode(this.originalTextBackup);
         range.insertNode(textNode);
-        
+
         // Orijinal metni seç
         const newSelection = window.getSelection();
         newSelection.removeAllRanges();
@@ -513,11 +538,11 @@ class ContentManager {
         newRange.selectNode(textNode);
         newSelection.addRange(newRange);
       }
-      
+
       // Backup'ı temizle
       this.originalTextBackup = null;
       this.selectedRange = null;
-      
+
       this.showToast('↶ Orijinal metin geri yüklendi', 2000);
     }
   }
