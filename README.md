@@ -238,7 +238,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 - **Issues**: GitHub Issues kullanın
 - **Email**: support@promptoptimizer.com
-- **Kahve ısmarla**: [Buy Me a Coffee](https://buymeacoffee.com/promptoptimizer)
+- **Kahve ısmarla**: [Buy Me a Coffee](https://buymeacoffee.com/osmntahir)
 
 ## 📈 Sürüm Geçmişi
 
