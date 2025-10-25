@@ -1,257 +1,168 @@
-# Prompt Optimizer Chrome Extension
+# 🚀 Prompt Optimizer
 
-Professional Chrome extension for optimizing text using Google Gemini AI.
+AI destekli prompt iyileştirme Chrome eklentisi. ChatGPT, Claude, Gemini gibi yapay zeka araçlarında kullanacağınız promptları daha etkili hale getirir.
 
-## Features
+---
 
-- 🚀 **Quick Optimization**: Right-click any selected text to optimize
-- ⌨️ **Keyboard Shortcut**: Ctrl+Shift+P for quick access  
-- 🎨 **Multiple Tones**: Formal, casual, technical, concise options
-- 📊 **Statistics**: Track usage and improvements
-- 📱 **Modern UI**: Clean, responsive interface
-- 🔒 **Privacy**: All processing via Google Gemini API
+### ☕ Destek Ol
+Projeyi beğendiysen bana bir kahve ısmarlamayı düşünebilirsin!
 
-## Installation
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/osmntahir)
 
-1. Download or clone this repository
-2. Open Chrome → `chrome://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the extension folder
-5. The extension is ready to use!
+---
 
-## Usage
+## ✨ Özellikler
 
-### Context Menu Method
-1. Select any text on a webpage
-2. Right-click and choose "Prompt İyileştir"
-3. Choose optimization style (formal, casual, etc.)
-4. View original and optimized versions
+- 🎯 **Hızlı Optimizasyon**: Herhangi bir metni seç, sağ tık ile optimize et
+- ⌨️ **Klavye Kısayolu**: `Ctrl+Shift+Y` ile anında erişim
+- 🔄 **Otomatik İyileştirme**: Metin seçince otomatik öneri göster (ayarlardan aktif et)
+- 🎨 **Çoklu Ton**: Dengeli, Resmi, Samimi, Teknik, Kısa ve Öz seçenekleri
+- 📚 **Geçmiş**: Son 10 optimizasyonunu kaydet ve tekrar kullan
+- 🔒 **Gizlilik**: Tüm veriler yerel olarak saklanır, takip yok
+- 🌐 **Google Gemini AI**: Güçlü AI ile profesyonel prompt oluşturma
 
-### Keyboard Shortcut
-- Press `Ctrl+Shift+P` with text selected
-- Optimization interface appears instantly
+## � Kurulum
 
-### Extension Popup
-- Click the extension icon in toolbar
-- View statistics and history
-- Access settings and preferences
+### Chrome Web Store'dan (Yakında)
+Eklenti Chrome Web Store'da yayınlandığında buraya link eklenecek.
 
-## License
+### Manuel Kurulum (Geliştirici Modu)
+1. Bu repository'yi bilgisayarına indir veya klonla:
+   ```bash
+   git clone https://github.com/osmntahir/prompt-optimizer-extension.git
+   ```
 
-MIT License - Feel free to modify and distribute.
-- **Karşılaştırma**: Orijinal ve iyileştirilmiş versiyonu yan yana görüntüleme
+2. Chrome tarayıcıda `chrome://extensions/` adresine git
 
-### Gelişmiş Özellikler
-- **Ton Seçenekleri**: Resmi, Samimi, Teknik, Kısa ve Öz seçenekleri
-- **Uzunluk Kontrolü**: Daha kısa veya daha uzun versiyonlar
-- **Çoklu Dil**: Türkçe ve İngilizce otomatik algılama
-- **Tek Tıkla Kopyalama**: Optimize edilmiş metni hızlıca kopyalama
-- **Geçmiş**: Son optimizasyonları görüntüleme
-- **İstatistikler**: Kullanım verilerini takip etme
+3. Sağ üstten **Geliştirici Modu**nu aktif et
 
-### Kullanıcı Deneyimi
-- **Modern UI**: Gradient renkleri ve animasyonlar
-- **Responsive**: Tüm ekran boyutlarında çalışır
-- **Dark Mode**: Otomatik tema desteği
-- **Toast Bildirimleri**: Kullanıcı dostu geri bildirimler
+4. **Paketlenmemiş öğe yükle** butonuna tıkla
+
+5. İndirdiğin klasörü seç
+
+6. Eklenti hazır! 🎉
+
+### Google Gemini API Anahtarı
+1. [Google AI Studio](https://aistudio.google.com/app/apikey) adresine git
+2. **Get API Key** ile ücretsiz API anahtarı oluştur
+3. Eklenti ayarlarından API anahtarını yapıştır
+4. Kaydet ve kullanmaya başla!
+
+## 🎯 Kullanım
+
+### Yöntem 1: Sağ Tık Menüsü
+1. Herhangi bir web sayfasında metin seç
+2. Sağ tık yap ve **"Prompt İyileştir"** seçeneğine tıkla
+3. Açılan pencerede ton seçeneğini belirle (Dengeli, Resmi, Samimi, vb.)
+4. İyileştirilmiş promptunu kopyala ve kullan!
+
+### Yöntem 2: Klavye Kısayolu
+1. Metni seç
+2. `Ctrl+Shift+Y` tuşlarına bas (Windows/Linux)
+3. veya `Cmd+Shift+Y` (Mac)
+4. İyileştirme penceresi anında açılır
+
+### Yöntem 3: Otomatik Öneri
+1. Ayarlardan **Otomatik İyileştirme**yi aktif et
+2. Artık herhangi bir metni seçtiğinde otomatik olarak iyileştirme penceresi belirir
+3. Ekstra tık veya klavye kısayoluna gerek yok!
+
+### Eklenti Popup'ı
+- Tarayıcı araç çubuğunda eklenti ikonuna tıkla
+- **Geçmiş**: Son 10 optimizasyonunu görüntüle ve tekrar kullan
+- **İstatistikler**: Toplam kullanım sayısını kontrol et
+- **Ayarlar**: Ton, otomatik iyileştirme ve diğer tercihleri yapılandır
+
+## 🛠 Teknolojiler
+
+- **Chrome Extension Manifest V3**: Modern eklenti standardı
+- **Vanilla JavaScript**: Framework bağımsız, hızlı ve hafif
+- **Google Gemini AI API**: Güçlü AI ile metin optimizasyonu
+- **Chrome Storage API**: Güvenli yerel veri saklama
+- **Modern CSS**: Gradient animasyonlar ve responsive tasarım
+
+## 📊 Ton Seçenekleri
+
+| Ton | Açıklama | Kullanım Alanı |
+|-----|----------|----------------|
+| **Dengeli** | Profesyonel ve tarafsız | Genel kullanım, çoğu senaryo |
+| **Resmi** | Kurumsal ve ciddi | İş mailleri, resmi belgeler |
+| **Samimi** | Dostça ve günlük | Sosyal medya, blog yazıları |
+| **Teknik** | Detaylı ve açıklayıcı | Kod, dokümantasyon, teknik içerik |
+| **Kısa ve Öz** | Minimal ve net | Hızlı sorular, özet bilgiler |
+
+## 🔐 Gizlilik ve Güvenlik
+
+- ✅ **Yerel Depolama**: API anahtarın ve geçmişin sadece senin bilgisayarında
+- ✅ **Şifrelenmiş Bağlantı**: Tüm API çağrıları HTTPS ile
+- ✅ **Takip Yok**: Hiçbir kullanıcı verisi toplanmaz veya paylaşılmaz
+- ✅ **Minimal İzinler**: Sadece gerekli Chrome izinleri kullanılır
+- ✅ **Açık Kaynak**: Tüm kod GitHub'da incelenebilir
+
+Detaylı gizlilik politikası: [Privacy Policy](https://osmntahir.github.io/prompt-optimizer-extension/privacy.html)
 
 ## 📁 Proje Yapısı
 
 ```
 prompt-optimizer-extension/
-├── manifest.json                 # Extension manifest
+├── manifest.json              # Eklenti yapılandırması
 ├── src/
+│   ├── popup.html            # Popup arayüzü
+│   ├── settings.html         # Ayarlar sayfası
+│   ├── welcome.html          # Hoş geldin sayfası
 │   ├── js/
-│   │   ├── background.js         # Service worker
-│   │   ├── content.js           # Content script
-│   │   └── popup.js             # Popup interface
+│   │   ├── background.js     # Arka plan script
+│   │   ├── content.js        # İçerik script
+│   │   ├── popup.js          # Popup logic
+│   │   └── settings.js       # Ayarlar logic
 │   ├── css/
-│   │   ├── content.css          # Content script styles
-│   │   └── popup.css            # Popup styles
+│   │   ├── content.css       # İçerik stilleri
+│   │   └── popup.css         # Popup stilleri
 │   ├── utils/
-│   │   ├── gemini-api.js        # API management
-│   │   └── storage-manager.js   # Data management
-│   ├── icons/                   # Extension icons
-│   ├── popup.html              # Popup interface
-│   └── welcome.html            # Welcome page
+│   │   ├── gemini-api.js     # AI API yönetimi
+│   │   └── storage-manager.js # Veri yönetimi
+│   └── icons/                # Eklenti iconları
 └── README.md
 ```
 
-## 🚀 Kurulum
-
-### 1. Geliştirici Modu Kurulumu
-1. Chrome'da `chrome://extensions/` adresine gidin
-2. "Geliştirici modu"nu etkinleştirin
-3. "Paketlenmemiş öğe yükle"yi tıklayın
-4. Bu proje klasörünü seçin
-
-### 2. API Anahtarı Kurulumu
-1. [Google AI Studio](https://makersuite.google.com/app/apikey) adresine gidin
-2. Yeni bir API anahtarı oluşturun
-3. Extension'da API anahtarınızı girin
-
-## 🎯 Kullanım
-
-### Temel Kullanım
-1. Herhangi bir web sayfasında metin seçin
-2. Sağ tık yapın ve "Prompt İyileştir" seçin
-3. Veya `Ctrl+Shift+P` kısayolunu kullanın
-
-### Gelişmiş Özellikler
-- **Ton Değiştirme**: Açılan pencerede ton seçeneklerini değiştirin
-- **Uzunluk Ayarlama**: Daha kısa veya uzun versiyonlar isteyin
-- **Geçmiş Görüntüleme**: Extension popup'ında geçmişi inceleyin
-- **İstatistikler**: Kullanım verilerinizi takip edin
-
-## 🛠 Teknoloji Stack
-
-### Chrome Extension API v3
-- **Background Script**: Service Worker tabanlı
-- **Content Scripts**: Web sayfası entegrasyonu
-- **Storage API**: Veri kalıcılığı
-- **Context Menus**: Sağ tık menü entegrasyonu
-
-### Frontend Teknolojileri
-- **Vanilla JavaScript**: Framework bağımsız
-- **Modern CSS**: Flexbox, Grid, Animations
-- **Responsive Design**: Mobil uyumlu
-- **Progressive Enhancement**: Kademeli geliştirme
-
-### API Entegrasyonu
-- **Google Gemini AI**: Metin optimizasyonu
-- **Fetch API**: HTTP istekleri
-- **Error Handling**: Kapsamlı hata yönetimi
-- **Rate Limiting**: API limit kontrolü
-
-## 🎨 Tasarım Özellikleri
-
-### Modern UI/UX
-- **Gradient Renkler**: #667eea → #764ba2
-- **Smooth Animations**: CSS transitions
-- **Glass Effect**: Backdrop blur
-- **Card Layout**: Modern kart tasarımı
-
-### Responsive Design
-- **Mobile First**: Mobil öncelikli tasarım
-- **Flexbox Layout**: Esnek düzen sistemi
-- **Adaptive UI**: Ekran boyutuna göre uyum
-- **Touch Friendly**: Dokunmatik cihaz desteği
-
-## 🔧 Geliştirme
-
-### Yerel Geliştirme
-```bash
-# Projeyi klonlayın
-git clone <repo-url>
-
-# Proje dizinine gidin
-cd prompt-optimizer-extension
-
-# Chrome'da yükleyin (yukarıdaki adımları takip edin)
-```
-
-### Debugging
-- **Console Logs**: Background ve content scriptlerde
-- **Chrome DevTools**: Extension debugging
-- **Storage Inspection**: chrome://extensions/
-- **Network Monitoring**: API çağrıları için
-
-## 📝 API Kullanımı
-
-### Google Gemini API
-```javascript
-const response = await fetch(
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', 
-  {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-goog-api-key': API_KEY
-    },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: optimizationPrompt
-        }]
-      }]
-    })
-  }
-);
-```
-
-## 📊 Özellik Detayları
-
-### Ton Seçenekleri
-- **Neutral**: Dengeli ve profesyonel
-- **Formal**: Resmi ve kurumsal
-- **Casual**: Samimi ve günlük
-- **Technical**: Teknik ve detaylı
-- **Concise**: Kısa ve öz
-
-### Dil Desteği
-- **Otomatik Algılama**: Metin analizi ile dil tespiti
-- **Türkçe**: Tam destek
-- **İngilizce**: Tam destek
-- **Manuel Seçim**: Kullanıcı tercihi
-
-## 🔐 Güvenlik
-
-### API Güvenliği
-- **Local Storage**: API anahtarları güvenli depolama
-- **HTTPS Only**: Şifrelenmiş bağlantılar
-- **No Data Leakage**: Veri sızıntısı koruması
-- **Permission Model**: Minimum izin prensibi
-
-### Privacy
-- **Local Processing**: Veriler yerel olarak işlenir
-- **No Tracking**: Kullanıcı takibi yok
-- **Opt-in Features**: İsteğe bağlı özellikler
-- **Data Control**: Kullanıcı veri kontrolü
-
-## 🎉 Gelecek Özellikler
-
-### v1.1 Planları
-- [ ] Özel ton tanımları
-- [ ] Bulk optimizasyon
-- [ ] Export/Import işlemleri
-- [ ] Keyboard shortcuts özelleştirme
-
-### v1.2 Planları
-- [ ] Multiple AI providers
-- [ ] Template sistem
-- [ ] Team collaboration
-- [ ] Analytics dashboard
-
 ## 🤝 Katkıda Bulunma
 
-1. Repository'yi fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request açın
+Katkılarınızı bekliyorum! Projeyi geliştirmek için:
+
+1. Repository'yi fork'la
+2. Yeni bir branch oluştur: `git checkout -b yeni-ozellik`
+3. Değişikliklerini commit et: `git commit -m 'Yeni özellik eklendi'`
+4. Branch'ini push'la: `git push origin yeni-ozellik`
+5. Pull Request aç
 
 ## 📄 Lisans
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+Bu proje MIT lisansı altında açık kaynaklıdır. Detaylar için [LICENSE](LICENSE) dosyasına bakabilirsin.
 
-## 💬 Destek
+## 💬 İletişim ve Destek
 
-- **Issues**: GitHub Issues kullanın
-- **Email**: support@promptoptimizer.com
-- **Kahve ısmarla**: [Buy Me a Coffee](https://buymeacoffee.com/osmntahir)
+- **GitHub Issues**: [Hata bildir veya öneride bulun](https://github.com/osmntahir/prompt-optimizer-extension/issues)
+- **Buy Me a Coffee**: [☕ Kahve ısmarla](https://buymeacoffee.com/osmntahir)
 
-## 📈 Sürüm Geçmişi
+## 🎉 Sürüm Notları
 
 ### v1.0.0 (İlk Sürüm)
-- ✅ Temel optimizasyon işlevleri
-- ✅ Sağ tık menü entegrasyonu  
-- ✅ Keyboard shortcuts
-- ✅ Modern UI tasarımı
-- ✅ API anahtarı yönetimi
-- ✅ Geçmiş ve istatistikler
-- ✅ Çoklu dil desteği
-- ✅ Responsive design
+- ✅ Google Gemini AI entegrasyonu
+- ✅ Sağ tık menüsü desteği
+- ✅ Klavye kısayolu: `Ctrl+Shift+Y`
+- ✅ Otomatik iyileştirme özelliği
+- ✅ 5 farklı ton seçeneği
+- ✅ Geçmiş kaydetme (maksimum 10)
+- ✅ Modern ve responsive UI
+- ✅ Türkçe dil desteği
+- ✅ Gizlilik odaklı tasarım
 
 ---
 
-**Made with ❤️ for better prompts**
+<div align="center">
+
+**AI ile daha iyi promptlar için ❤️ ile yapıldı**
+
+[⭐ Star](https://github.com/osmntahir/prompt-optimizer-extension) | [🐛 Issue](https://github.com/osmntahir/prompt-optimizer-extension/issues) | [☕ Coffee](https://buymeacoffee.com/osmntahir)
+
+</div>
