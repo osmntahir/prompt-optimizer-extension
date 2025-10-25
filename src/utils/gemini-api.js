@@ -43,7 +43,7 @@ class GeminiAPI {
           threshold: "BLOCK_MEDIUM_AND_ABOVE"
         },
         {
-          category: "HARM_CATEGORY_HATE_SPEECH", 
+          category: "HARM_CATEGORY_HATE_SPEECH",
           threshold: "BLOCK_MEDIUM_AND_ABOVE"
         },
         {
@@ -80,7 +80,7 @@ class GeminiAPI {
       }
 
       const data = await response.json();
-      
+
       if (!data.candidates || data.candidates.length === 0) {
         throw new Error('API\'den geçerli bir yanıt alınamadı');
       }
@@ -97,7 +97,7 @@ class GeminiAPI {
 
       const optimizedText = candidate.content.parts[0].text;
       return this.cleanOptimizedText(optimizedText);
-      
+
     } catch (error) {
       if (error.name === 'AbortError') {
         throw new Error('API zaman aşımına uğradı (20s)');
@@ -109,18 +109,18 @@ class GeminiAPI {
       } else if (error.message.includes('NetworkError') || error.name === 'TypeError') {
         throw new Error('İnternet bağlantısı sorunu');
       }
-      
+
       throw error;
     }
   }
 
   buildOptimizationPrompt(text, options) {
     const { tone, language, style, length } = options;
-    
+
     let prompt = `Sen bir prompt iyileştirme uzmanısın. Görevin verilen prompt'u yapay zeka modellerinin daha iyi anlayıp işleyebileceği şekilde iyileştirmek.\n\nÖNEMLİ: Metni kısaltma veya özetleme! Sadece AI'ın anlayacağı şekilde yeniden yazıp iyileştir.\n\nİyileştirilecek prompt:\n"${text}"\n\n`;
-    
+
     prompt += `İyileştirme kriterleri:\n`;
-    
+
     // Ton ayarları
     switch (tone) {
       case 'formal':
@@ -138,7 +138,7 @@ class GeminiAPI {
       default:
         prompt += `- Dengeli ve anlaşılır bir ton kullan\n`;
     }
-    
+
     // Uzunluk ayarları
     switch (length) {
       case 'shorter':
@@ -150,7 +150,7 @@ class GeminiAPI {
       default:
         prompt += `- Benzer detay seviyesinde tut, sadece netliği artır\n`;
     }
-    
+
     // Dil ayarları
     if (language === 'tr') {
       prompt += `- Türkçe olarak yanıtla\n`;
@@ -159,23 +159,23 @@ class GeminiAPI {
     } else {
       prompt += `- Orijinal metnin dilinde yanıtla\n`;
     }
-    
+
     prompt += `\nPrompt iyileştirme hedeflerin:\n`;
     prompt += `✓ Belirsizlikleri gider ve net talimatlar ver\n`;
     prompt += `✓ Context ve bağlam bilgilerini netleştir\n`;
     prompt += `✓ AI'ın anlayacağı açık ve yapılandırılmış format kullan\n`;
     prompt += `✓ Gereksiz kelimelerden arındır ama içeriği koru\n`;
     prompt += `✓ Daha spesifik ve actionable (eyleme dönük) hale getir\n\n`;
-    
+
     prompt += `ÖNEMLİ: Sadece iyileştirilmiş prompt'u döndür. Tırnak işareti, kod bloğu, açıklama veya ek format kullanma. Direkt metni ver.`;
-    
+
     return prompt;
   }
 
   cleanOptimizedText(text) {
     // Gereksiz karakterleri ve formatlamayı temizle
     let cleaned = text.trim();
-    
+
     // Başındaki ve sonundaki tırnak işaretlerini kaldır (tek veya çift tırnak)
     // Birden fazla kez uygula (iç içe tırnaklar için)
     while (cleaned.startsWith('"') || cleaned.startsWith("'") || cleaned.startsWith('"') || cleaned.startsWith('"')) {
@@ -184,14 +184,14 @@ class GeminiAPI {
     while (cleaned.endsWith('"') || cleaned.endsWith("'") || cleaned.endsWith('"') || cleaned.endsWith('"')) {
       cleaned = cleaned.substring(0, cleaned.length - 1);
     }
-    
+
     // Markdown kod bloklarını kaldır
     cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
     cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
-    
+
     // Fazladan boşlukları temizle
     cleaned = cleaned.trim();
-    
+
     return cleaned;
   }
 
@@ -199,7 +199,7 @@ class GeminiAPI {
   detectLanguage(text) {
     const turkishChars = /[çğıöşüÇĞIİÖŞÜ]/g;
     const turkishWords = /\b(ve|bir|bu|şu|ile|için|gibi|kadar|daha|çok|az|her|hiç|kendi|onun|bunun|şunun)\b/gi;
-    
+
     if (turkishChars.test(text) || turkishWords.test(text)) {
       return 'tr';
     }
